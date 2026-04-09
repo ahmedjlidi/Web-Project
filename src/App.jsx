@@ -1,14 +1,16 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import SignInUpForm from "./pages/SignInUp/SignInUp.jsx";
-import Dashboard from "./pages/Dashboard/Dashboard.jsx";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home.jsx";
+import SignInUp from "./SignInUp.jsx";
+import Dashboard from "./Dashboard.jsx";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<SignInUpForm />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/signin" element={<SignInUp />} />
+        <Route path="/signup" element={<SignInUp />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
   );
