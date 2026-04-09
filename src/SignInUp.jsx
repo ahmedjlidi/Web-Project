@@ -1,87 +1,35 @@
-import { useState } from 'react'
-import './SignInUp.css'
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './SignInUp.css';
 
 function SignInUpForm() {
-    const [isLogin, setSignIn] = useState(true)
-    const [user, setUser] = useState('')
-    const [pwd, setPwd] = useState('')
-    const [success, setSuccess] = useState(false)
-    const [errMsg, setErrMsg] = useState('')
+    const [isLogin, setSignIn] = useState(true);
+    const navigate = useNavigate();
 
     function toggleSignUp() {
-        setSignIn(!isLogin)
-        setSuccess(false)
-        setErrMsg('')
-        setUser('')
-        setPwd('')
+        setSignIn(!isLogin);
     }
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-
-        try {
-            setErrMsg('')
-
-            if (isLogin) {
-                // later: call login API here
-                // const response = await ...
-                // const accessToken = response?.data?.accessToken
-                // const roles = response?.data?.roles
-                // setAuth({ user, pwd, roles, accessToken })
-
-                setUser('')
-                setPwd('')
-                setSuccess(true)
-            } else {
-                // signup logic will be added later
-                setSuccess(false)
-            }
-        } catch (err) {
-            setErrMsg('Login failed')
-            setSuccess(false)
-        }
-    }
+    const handleAuth = (e) => {
+        e.preventDefault();
+        navigate('/dashboard'); 
+    };
 
     return (
         <div className="page">
-            <form className="form" onSubmit={handleSubmit}>
+            <form className="form" onSubmit={handleAuth}> 
                 <div className="logo">StudyBuddy</div>
 
-                <h2>{isLogin ? 'Log In' : 'Sign Up'}</h2>
+                {isLogin ? <h2>Log In</h2> : <h2>Sign Up</h2>}
                 <p className="subtitle">
-                    {isLogin ? 'Log into your account' : 'Create your account'}
+                    {isLogin ? "Log into your account" : "Create your account"}
                 </p>
 
-                {errMsg && isLogin && (
-                    <p className="error-message">{errMsg}</p>
-                )}
-
-                {success && isLogin && (
-                    <p className="success-message">Login successful</p>
-                )}
-
-                <label htmlFor="username">Username</label>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    name="username"
-                    id="username"
-                    autoComplete="off"
-                    value={user}
-                    onChange={(e) => setUser(e.target.value)}
-                    required
-                />
+                <label htmlFor="email">Email</label>
+                <input type="email" placeholder="Email" id="email" required />
 
                 <label htmlFor="password">Password</label>
-                <input
-                    type="password"
-                    placeholder="Password"
-                    name="password"
-                    id="password"
-                    value={pwd}
-                    onChange={(e) => setPwd(e.target.value)}
-                    required
-                />
+                <input type="password" placeholder="Password" id="password" required />
 
                 {isLogin && (
                     <div className="extra-link">
@@ -89,17 +37,12 @@ function SignInUpForm() {
                     </div>
                 )}
 
-                <button type="submit">
-                    {isLogin ? 'Log In' : 'Sign Up'}
-                </button>
+                <button type="submit">{isLogin ? "Log In" : "Sign Up"}</button>
 
                 <p>
-                    {isLogin ? "Don't have an account?" : 'Already have an account?'}
-                    <span
-                        onClick={toggleSignUp}
-                        style={{ cursor: 'pointer', color: 'blue' }}
-                    >
-                        {isLogin ? ' Sign up' : ' Log in'}
+                    {isLogin ? "Don't have an account?" : "Already have an account?"}
+                    <span onClick={toggleSignUp} style={{ cursor: "pointer", color: "#4c7dff", fontWeight: 'bold' }}>
+                        {isLogin ? " Sign up" : " Log in"}
                     </span>
                 </p>
 
@@ -110,7 +53,7 @@ function SignInUpForm() {
                 </div>
             </form>
         </div>
-    )
+    );
 }
 
-export default SignInUpForm
+export default SignInUpForm;

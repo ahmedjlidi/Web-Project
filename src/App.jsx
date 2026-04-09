@@ -1,19 +1,9 @@
-/*import SignInUpForm from './SignInUp'
 
-function App() {
-  return (
-
-    <SignInUpForm />
-
-  )
-}
-
-export default App
-*/
-
+import SignInUpForm from './SignInUp'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import SignInUp from "./SignInUp";
+import Home from "./pages/Home.jsx";
+import SignInUp from "./SignInUp.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
 
 function App() {
   return (
@@ -22,9 +12,9 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/signin" element={<SignInUp />} />
         <Route path="/signup" element={<SignInUp />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </Router>
   );
 }
-
-export default App;
+export default App
