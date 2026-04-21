@@ -1,20 +1,17 @@
-
-import SignInUpForm from './SignInUp'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home.jsx";
-import SignInUp from "./SignInUp.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
+import Home from "./pages/Home";
+import Authentication from "./pages/Authentication";
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/signin" element={<SignInUp />} />
-        <Route path="/signup" element={<SignInUp />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/signin" element={<Authentication state="login" />} />
+        <Route path="/signup" element={<Authentication state="signup" />} />
       </Routes>
     </Router>
   );
 }
+
 export default App

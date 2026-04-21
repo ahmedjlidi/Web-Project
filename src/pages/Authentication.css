@@ -145,14 +145,14 @@ body {
     text-decoration: underline;
 }
 
-.footer-links {
+.footer {
     margin-top: 24px;
     text-align: center;
     font-size: 0.9rem;
     color: #8a96ad;
 }
 
-.footer-links a {
+.footer a {
     color: #7a88a6;
     font-weight: 500;
     margin: 0 8px;
