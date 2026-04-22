@@ -1,5 +1,7 @@
 import React from "react";
 import data from "../data/analyticsData.json";
+import "./Analytics.css";
+
 import {
   LineChart,
   Line,
@@ -10,7 +12,7 @@ import {
   BarChart,
   Bar
 } from "recharts";
-import "./analytics.css";
+
 
 function Analytics() {
   const sessions = data.sessions;
