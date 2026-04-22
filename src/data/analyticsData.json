@@ -1,0 +1,97 @@
+{
+  "users": [
+    {
+      "userID": 1,
+      "name": "Ahmed Jlidi",
+      "email": "ahmed@email.com",
+      "passwordHash": "hashed_pass_123",
+      "profilePicture": "ahmed.jpg",
+      "preferredSessionLength": 45,
+      "averageDailyStudyTime": 180
+    },
+    {
+      "userID": 2,
+      "name": "Shahd Derbass",
+      "email": "shahd@email.com",
+      "passwordHash": "hashed_pass_456",
+      "profilePicture": "shahd.png",
+      "preferredSessionLength": 30,
+      "averageDailyStudyTime": 120
+    }
+  ],
+
+  "tasks": [
+    {
+      "taskID": 101,
+      "userID": 1,
+      "title": "Study Data Structures Chapter 3",
+      "estimatedDuration": 60,
+      "deadline": "2026-04-05",
+      "difficulty": 4,
+      "priority": 3,
+      "category": "Reading",
+      "notes": "Focus on trees section",
+      "status": "In Progress",
+      "createdAt": "2026-03-28 10:00",
+      "updatedAt": "2026-03-29 14:00"
+    },
+    {
+      "taskID": 102,
+      "userID": 2,
+      "title": "Solve Calculus Problems",
+      "estimatedDuration": 90,
+      "deadline": "2026-04-02",
+      "difficulty": 5,
+      "priority": 3,
+      "category": "Practice",
+      "notes": "Complete assignment sheet",
+      "status": "Not Started",
+      "createdAt": "2026-03-27 09:30",
+      "updatedAt": "2026-03-27 09:30"
+    },
+    {
+      "taskID": 103,
+      "userID": 3,
+      "title": "Review Operating Systems Notes",
+      "estimatedDuration": 45,
+      "deadline": "2026-04-01",
+      "difficulty": 3,
+      "priority": 2,
+      "category": "Revision",
+      "notes": "Focus on scheduling chapter",
+      "status": "Completed",
+      "createdAt": "2026-03-26 18:00",
+      "updatedAt": "2026-03-28 20:00"
+    }
+  ],
+
+  "sessions": [
+    {
+      "sessionID": 201,
+      "taskID": 101,
+      "startTime": "2026-03-29 14:00",
+      "endTime": "2026-03-29 14:40",
+      "duration": 40,
+      "completionPercentage": 60,
+      "interruptions": 2
+    },
+    {
+      "sessionID": 202,
+      "taskID": 101,
+      "startTime": "2026-03-30 16:00",
+      "endTime": "2026-03-30 16:30",
+      "duration": 30,
+      "completionPercentage": 40,
+      "interruptions": 1
+    },
+    {
+      "sessionID": 203,
+      "taskID": 103,
+      "startTime": "2026-03-28 19:00",
+      "endTime": "2026-03-28 19:50",
+      "duration": 50,
+      "completionPercentage": 100,
+      "interruptions": 0
+    }
+  ]
+}

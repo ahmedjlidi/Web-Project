@@ -1,0 +1,58 @@
+.analytics-container {
+  padding: 40px;
+  background: #f5f7fb;
+  min-height: 100vh;
+  max-width: 900px;
+  margin: auto;
+}
+
+.subtitle {
+  color: #64748b;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+/* cards */
+.cards {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.card {
+  flex: 1;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.card p {
+  font-size: 14px;
+  color: gray;
+}
+
+.card h2 {
+  margin: 5px 0;
+}
+
+/* insight */
+.insight {
+  background: #eaf2ff;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+/* bottom */
+.bottom {
+  display: flex;
+  gap: 15px;
+}
+
+.chart-box,
+.task-box {
+  flex: 1;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+}

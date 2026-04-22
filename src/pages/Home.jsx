@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 function Home() {
   return (
     <div className="home">
-      {/* NAVBAR */}
       <header className="navbar">
         <div className="logo">
             <img src={logo} alt="logo" className="logo-img" />
@@ -18,7 +17,6 @@ function Home() {
         </div>
       </header>
 
-      {/* HERO */}
       <section className="hero">
         <div className="badge">
           <span className="dot"></span>
