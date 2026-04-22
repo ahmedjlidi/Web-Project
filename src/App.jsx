@@ -17,6 +17,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
+<<<<<<< HEAD
 
         <Route
           path="/signin"
@@ -60,6 +61,13 @@ function App() {
             )
           }
         />
+=======
+        <Route path="/signin" element={<Authentication _state="login" />} />
+        <Route path="/signup" element={<Authentication _state="signup" />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+>>>>>>> f4f3949235a2087fb0926a908adbbccd854c94b9
       </Routes>
     </Router>
   );
