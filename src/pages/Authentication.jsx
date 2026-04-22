@@ -3,6 +3,7 @@ import './Authentication.css'
 import Input from '../components/Input'
 import { USER_REGEX, PWD_REGEX } from '../components/validation'
 import logo from '../assets/logo.svg'
+import { useNavigate } from 'react-router-dom'
 
 function Authentication({ _state }) {
     const [currState, setCurrState] = useState(_state)
@@ -19,6 +20,8 @@ function Authentication({ _state }) {
 
     const [showValidation, setShowValidation] = useState(false)
     const [success, setSuccess] = useState(false)
+
+    const navigate = useNavigate()
 
     const resetForm = (nextIsLogin) => {
         setIsLogin(nextIsLogin)
@@ -111,7 +114,11 @@ function Authentication({ _state }) {
         if (!formIsValid) return
 
         console.log(`Username: ${user}\tPassword: ${pwd}`)
+
         setSuccess(true)
+
+        // navigate after success
+        navigate('/dashboard')
     }
 
     return (
