@@ -1,0 +1,37 @@
+.input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.input-wrapper input.input-error {
+    border-color: #d93025;
+}
+
+.input-wrapper input.input-valid {
+    border-color: green;
+}
+
+.input-popup {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 8px);
+    background: white;
+    color: #222;
+    border: 1px solid #d0d0d0;
+    border-left: 4px solid #f59e0b;
+    padding: 10px 12px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    font-size: 14px;
+    width: 100%;
+    z-index: 10;
+}
