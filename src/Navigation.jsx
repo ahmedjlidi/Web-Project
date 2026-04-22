@@ -1,6 +1,6 @@
 import { Nav } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-
+import "./Navigation.css" 
 function Navigation({ user }) {
   const location = useLocation();
   const navigate = useNavigate();
