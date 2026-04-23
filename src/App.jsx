@@ -9,6 +9,7 @@ import Navigation from "./Navigation";
 function TasksPage() {
   return <h1>Tasks Page</h1>;
 }
+
 function Layout() {
   const user = { name: "student", email: "student@example.com" };
 
@@ -35,11 +36,6 @@ function App() {
         <Route path="/signin" element={<Authentication state="login" />} />
         <Route path="/signup" element={<Authentication state="signup" />} />
         <Route path="/*" element={<Layout />} />
-        <Route path="/signin" element={<Authentication _state="login" />} />
-        <Route path="/signup" element={<Authentication _state="signup" />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/analytics" element={<Analytics />} />
-        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </Router>
   );
