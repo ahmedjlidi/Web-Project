@@ -1,10 +1,4 @@
-export const USER_REGEX = /^(?=.*[A-Z])(?=.*[0-9])[A-Za-z][A-Za-z0-9_]{7,29}$//*
-Rules:
-- starts with a letter
-- letters, digits, underscore only
-- total length 3 to 16
-*/
-
+export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 export const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,24}$/
 /*
 Rules:

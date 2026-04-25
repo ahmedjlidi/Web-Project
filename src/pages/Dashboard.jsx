@@ -1,27 +1,76 @@
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
+import TaskList from "../components/TaskList";
 import "./Dashboard.css";
+import AddTask from "../components/AddTask";
 
 function Dashboard() {
-  const [tasks, setTasks] = useState([]);
 
-  const activeTasks = tasks.filter((t) => t.status !== "Completed");
-  const pendingTasksCount = tasks.filter((t) => t.status === "Pending").length;
+
+  // In the future, Load from the database
+
+  const [tasks, setTasks] = useState([
+    {
+      taskID: 101,
+      userID: 1,
+      title: "Web Project",
+      estimatedDuration: 60,
+      deadline: "Mar 2, 4:50 PM",
+      difficulty: 3,
+      priority: 2,
+      category: "Project",
+      notes: "Finish Task component styling",
+      createdAt: "2026-03-28T10:00:00",
+      updatedAt: "2026-03-29T14:00:00",
+      currentProgress: 40
+    },
+    {
+      taskID: 102,
+      userID: 1,
+      title: "Operating Systems",
+      estimatedDuration: 90,
+      deadline: "Mar 3, 8:00 PM",
+      difficulty: 5,
+      priority: 3,
+      category: "Study",
+      notes: "Review memory management slides",
+      createdAt: "2026-03-28T11:00:00",
+      updatedAt: "2026-03-29T15:00:00",
+      currentProgress: 0
+    }
+  ]);
+
+  const [showAddTask, setShowAddTask] = useState(false);
+
+  const activeTasks = tasks.filter((task) => task.currentProgress < 100);
+  const completedTasks = tasks.filter((task) => task.currentProgress >= 100);
+
+  const pendingTasksCount = tasks.filter((task) => task.currentProgress === 0).length;
   const activeTasksCount = activeTasks.length;
 
   return (
     <>
       <div className="dashboard-header">
         <div>
-          <h1>Welcome back, student 👋</h1>
+          <h1>Welcome back, student</h1>
           <p>
-            Let&apos;s make today productive. You have {activeTasks.length} priority tasks.
+            Let&apos;s make today productive. You have {activeTasks.length} active tasks.
           </p>
         </div>
 
-        <Button className="new-task-button">
+        <Button
+          className="new-task-button"
+          onClick={() => setShowAddTask(true)}
+        >
           + New Task
         </Button>
+
+        {showAddTask && (
+          <AddTask
+            setTasks={setTasks}
+            onClose={() => setShowAddTask(false)}
+          />
+        )}
       </div>
 
       <div className="stats-grid">
@@ -40,20 +89,17 @@ function Dashboard() {
         <h2>Priority Action Items</h2>
       </div>
 
-      {activeTasks.length === 0 ? (
+      {tasks.length === 0 ? (
         <div className="empty-box">
           <h3>All caught up!</h3>
           <p>You have no tasks yet.</p>
         </div>
       ) : (
-        <div className="tasks-grid">
-          {activeTasks.map((task) => (
-            <div key={task.id} className="task-box">
-              <h4>{task.title}</h4>
-              <p>Status: {task.status}</p>
-            </div>
-          ))}
-        </div>
+        <TaskList
+          tasks={activeTasks}
+          completedTasks={completedTasks}
+          setTasks={setTasks}
+        />
       )}
     </>
   );

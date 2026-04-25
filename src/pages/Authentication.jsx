@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import './Authentication.css'
 import Input from '../components/Input'
-import { USER_REGEX, PWD_REGEX } from '../components/validation'
+import { EMAIL_REGEX, PWD_REGEX } from '../components/validation'
 import logo from '../assets/logo.svg'
 import { useNavigate } from 'react-router-dom'
 
@@ -9,29 +9,38 @@ function Authentication({ _state }) {
     const [currState, setCurrState] = useState(_state)
     const [isLogin, setIsLogin] = useState(_state === 'login')
 
-    const [user, setUser] = useState('')
+    const [email, setEmail] = useState('')
     const [pwd, setPwd] = useState('')
 
-    const [userValid, setUserValid] = useState(false)
+    const [emailValid, setEmailValid] = useState(false)
     const [pwdValid, setPwdValid] = useState(false)
 
-    const [userError, setUserError] = useState('')
+    const [emailError, setEmailError] = useState('')
     const [pwdError, setPwdError] = useState('')
 
-    const [showValidation, setShowValidation] = useState(false)
+    const [emailTouched, setEmailTouched] = useState(false)
+    const [pwdTouched, setPwdTouched] = useState(false)
+    const [submitted, setSubmitted] = useState(false)
+
     const [success, setSuccess] = useState(false)
 
     const navigate = useNavigate()
 
     const resetForm = (nextIsLogin) => {
         setIsLogin(nextIsLogin)
-        setUser('')
+        setEmail('')
         setPwd('')
-        setUserValid(false)
+
+        setEmailValid(false)
         setPwdValid(false)
-        setUserError('')
+
+        setEmailError('')
         setPwdError('')
-        setShowValidation(false)
+
+        setEmailTouched(false)
+        setPwdTouched(false)
+        setSubmitted(false)
+
         setSuccess(false)
     }
 
@@ -41,7 +50,7 @@ function Authentication({ _state }) {
         resetForm(nextIsLogin)
     }
 
-    const validateLoginUsername = (value) => {
+    const validateLoginEmail = (value) => {
         if (value.trim().length === 0) {
             return 'You cannot leave this field empty'
         }
@@ -55,13 +64,13 @@ function Authentication({ _state }) {
         return ''
     }
 
-    const validateSignupUsername = (value) => {
+    const validateSignupEmail = (value) => {
         if (value.trim().length === 0) {
             return 'You cannot leave this field empty'
         }
 
-        if (!USER_REGEX.test(value)) {
-            return 'Username must be 8 to 30 characters, start with a letter, include at least one uppercase letter and one digit.'
+        if (!EMAIL_REGEX.test(value)) {
+            return 'Please enter a valid email address.'
         }
 
         return ''
@@ -79,48 +88,89 @@ function Authentication({ _state }) {
         return ''
     }
 
-    const validateForm = () => {
-        let userErr = ''
-        let pwdErr = ''
+    const validateEmail = (value) => {
+        return isLogin ? validateLoginEmail(value) : validateSignupEmail(value)
+    }
 
-        if (isLogin) {
-            userErr = validateLoginUsername(user)
-            pwdErr = validateLoginPassword(pwd)
-        } else {
-            userErr = validateSignupUsername(user)
-            pwdErr = validateSignupPassword(pwd)
-        }
-
-        setUserError(userErr)
-        setPwdError(pwdErr)
-
-        setUserValid(userErr === '')
-        setPwdValid(pwdErr === '')
-
-        return userErr === '' && pwdErr === ''
+    const validatePassword = (value) => {
+        return isLogin ? validateLoginPassword(value) : validateSignupPassword(value)
     }
 
     useEffect(() => {
-        if (!showValidation) return
-        validateForm()
-    }, [user, pwd, isLogin, showValidation])
+        const emailErr = validateEmail(email)
+        setEmailError(emailErr)
+        setEmailValid(emailErr === '')
+    }, [email, isLogin])
 
-    const handleSubmit = (e) => {
+    useEffect(() => {
+        const pwdErr = validatePassword(pwd)
+        setPwdError(pwdErr)
+        setPwdValid(pwdErr === '')
+    }, [pwd, isLogin])
+
+    const handleSubmit = async (e) => {
         e.preventDefault()
         setSuccess(false)
-        setShowValidation(true)
+        setSubmitted(true)
 
-        const formIsValid = validateForm()
-        if (!formIsValid) return
+        const emailErr = validateEmail(email)
+        const pwdErr = validatePassword(pwd)
 
-        console.log(`Username: ${user}\tPassword: ${pwd}`)
+        setEmailError(emailErr)
+        setPwdError(pwdErr)
 
-        setSuccess(true)
+        setEmailValid(emailErr === '')
+        setPwdValid(pwdErr === '')
 
-        // navigate after success
-        navigate('/dashboard')
+        if (emailErr || pwdErr) return
+
+        try {
+            let response
+            let data
+
+            if (isLogin) {
+                // ===== LOGIN REQUEST =====
+                // response = await fetch('/api/auth/login', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify({ email, password: pwd })
+                // })
+
+            } else {
+                // ===== SIGNUP REQUEST =====
+                // response = await fetch('/api/auth/register', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify({ email, password: pwd })
+                // })
+            }
+
+            // data = await response.json()
+
+            // ===== SUCCESS HANDLING =====
+            setSuccess(true)
+
+            if (isLogin) {
+                // Example: store token after login
+                // localStorage.setItem('token', data.token)
+
+                navigate('/dashboard')
+            } else {
+                // Signup success behavior
+                // Option 1: redirect to login
+                // navigate('/login')
+
+                // Option 2: stay and show success
+            }
+
+        } catch (err) {
+            console.error(err)
+
+            // ===== ERROR HANDLING =====
+            setPwdError('Operation failed. Please try again.')
+            setPwdValid(false)
+        }
     }
-
     return (
         <div className="page">
             <form className="form" onSubmit={handleSubmit} noValidate>
@@ -140,16 +190,17 @@ function Authentication({ _state }) {
                     </p>
                 )}
 
-                <label htmlFor="username">Username</label>
+                <label htmlFor="email">Email</label>
                 <Input
-                    id="username"
+                    id="email"
                     type="text"
-                    input={user}
-                    setInput={setUser}
-                    placeholder="Enter username"
-                    isValid={userValid}
-                    errorMessage={userError}
-                    showValidation={showValidation}
+                    input={email}
+                    setInput={setEmail}
+                    placeholder="Enter email"
+                    isValid={emailValid}
+                    errorMessage={emailError}
+                    showValidation={isLogin ? submitted : (emailTouched || submitted)}
+                    onFirstInteraction={() => setEmailTouched(true)}
                 />
 
                 <label htmlFor="password">Password</label>
@@ -161,7 +212,8 @@ function Authentication({ _state }) {
                     placeholder="Enter password"
                     isValid={pwdValid}
                     errorMessage={pwdError}
-                    showValidation={showValidation}
+                    showValidation={isLogin ? submitted : (pwdTouched || submitted)}
+                    onFirstInteraction={() => setPwdTouched(true)}
                 />
 
                 {isLogin && (

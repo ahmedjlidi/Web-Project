@@ -8,7 +8,8 @@ function Input({
     placeholder,
     isValid,
     errorMessage,
-    showValidation
+    showValidation,
+    onFirstInteraction
 }) {
     const showError = showValidation && !isValid
     const showValid = showValidation && isValid && input.trim().length > 0
@@ -17,13 +18,18 @@ function Input({
     if (showError) className = 'input-error'
     else if (showValid) className = 'input-valid'
 
+    const handleChange = (e) => {
+        onFirstInteraction()
+        setInput(e.target.value)
+    }
+
     return (
         <div className="input-wrapper">
             <input
                 id={id}
                 type={type}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={handleChange}
                 placeholder={placeholder}
                 autoComplete="off"
                 className={className}

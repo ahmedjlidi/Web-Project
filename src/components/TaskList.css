@@ -1,0 +1,16 @@
+.task-list {
+    padding: 24px;
+}
+
+.task-list h2 {
+    margin: 24px 0 16px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.task-list-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
