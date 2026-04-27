@@ -122,6 +122,7 @@ function Task({
 
             {showDetails && (
                 <TaskDetail
+                    taskID={taskID}
                     title={title}
                     estimatedDuration={estimatedDuration}
                     deadline={deadline}

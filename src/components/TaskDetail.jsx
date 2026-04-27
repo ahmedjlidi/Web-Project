@@ -1,6 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import "./TaskDetail.css";
 
 function TaskDetail({
+    taskID,
     title,
     estimatedDuration,
     deadline,
@@ -14,6 +16,12 @@ function TaskDetail({
     status,
     onClose
 }) {
+    const navigate = useNavigate();
+
+    function handleStartFocusSession() {
+        navigate(`/focus-session/${taskID}`);
+    }
+
     return (
         <div className="task-detail-overlay">
             <div className="task-detail-modal">
@@ -101,7 +109,10 @@ function TaskDetail({
                     </div>
                 </div>
 
-                <button className="start-focus-button">
+                <button
+                    className="start-focus-button"
+                    onClick={handleStartFocusSession}
+                >
                     Start Focus Session
                 </button>
             </div>
