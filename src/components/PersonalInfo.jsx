@@ -1,5 +1,7 @@
 import React from "react";
 import { User } from "lucide-react";
+import { EMAIL_REGEX } from '../components/validation'
+
 
 function PersonalInfo({
   name,
@@ -12,21 +14,40 @@ function PersonalInfo({
   emailError,
   setEmailError,
   avatar,
-  setAvatar   
+  setAvatar
 }) {
-    const handleImageChange = (e) => {
-      const file = e.target.files[0];
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
 
-      if (file) {
-        const reader = new FileReader();
+    if (file) {
+      const reader = new FileReader();
 
-        reader.onloadend = () => {
-          setAvatar(reader.result); // ase64 string
-        };
+      reader.onloadend = () => {
+        setAvatar(reader.result); // ase64 string
+      };
 
-        reader.readAsDataURL(file);
-      }
-    };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const validateEmail = (value) => {
+    if (value.trim().length === 0) {
+      return 'You cannot leave this field empty'
+    }
+
+    if (!EMAIL_REGEX.test(value)) {
+      return 'Please enter a valid email address.'
+    }
+
+    return ''
+  }
+
+  useEffect(() => {
+    const emailErr = validateEmail(email)
+    setEmailError(emailErr)
+    setEmailValid(emailErr === '')
+  }, [email, isLogin])
+
 
   return (
     <div className="section">
@@ -36,19 +57,19 @@ function PersonalInfo({
         <div className="left">
           <div className="avatar">
             {/*<User size={40} />*/}
-              {avatar ? (
-                <img src={avatar} alt="avatar" className="avatar-img" />
-              ) : (
-                <User size={40} />
-              )}
-              {/* hidden file input*/}
-              <input
-                type="file"
-                accept="image/*"
-                style={{ display: "none" }}
-                id="avatarInput"
-                onChange={handleImageChange}
-              />
+            {avatar ? (
+              <img src={avatar} alt="avatar" className="avatar-img" />
+            ) : (
+              <User size={40} />
+            )}
+            {/* hidden file input*/}
+            <input
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              id="avatarInput"
+              onChange={handleImageChange}
+            />
           </div>
           <button
             className="btn primary"
@@ -100,7 +121,7 @@ function PersonalInfo({
               onChange={(e) => {
                 setPassword(e.target.value);
                 setEmailError(""); // clears error while typing
-                }}
+              }}
             />
             {emailError && <p className="error">{emailError}</p>}
           </div>

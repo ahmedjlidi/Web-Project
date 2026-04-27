@@ -5,6 +5,7 @@ import PersonalInfo from "../components/PersonalInfo";
 import StudyPreferences from "../components/StudyPreferences";
 import Actions from "../components/Actions";
 
+
 function Profile({ setUser }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -49,7 +50,7 @@ function Profile({ setUser }) {
       const result = await res.json();
 
       if (!res.ok) {
-        console.error(result);    
+        console.error(result);
         alert("Save failed: " + result.error);
         return;
       }
@@ -79,29 +80,29 @@ function Profile({ setUser }) {
       return;
     }
 
-  try {
-    const res = await fetch("http://localhost:5001/profile/email", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch("http://localhost:5001/profile/email", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const result = await res.json();
+      const result = await res.json();
 
-    if (!res.ok) {
-      setEmailError(result.error);
-      return;
+      if (!res.ok) {
+        setEmailError(result.error);
+        return;
+      }
+
+      alert("Email updated!");
+      setEmailError("");
+    } catch (err) {
+      console.error(err);
+      alert("Update failed!");
     }
-
-    alert("Email updated!");
-    setEmailError("");
-  } catch (err) {
-    console.error(err);
-    alert("Update failed!");
-  }
-};
+  };
 
   const getAccuracyLabel = () => {
     if (accuracy === 1) return "Low (I underestimate)";

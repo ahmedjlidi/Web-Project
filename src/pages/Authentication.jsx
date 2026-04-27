@@ -54,6 +54,11 @@ function Authentication({ _state }) {
         if (value.trim().length === 0) {
             return 'You cannot leave this field empty'
         }
+
+        if (!EMAIL_REGEX.test(value)) {
+            return 'Please enter a valid email address.'
+        }
+
         return ''
     }
 
