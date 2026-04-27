@@ -3,17 +3,16 @@ import { User } from "lucide-react";
 
 function PersonalInfo({
   name,
-  setName,
   email,
-  setEmail,
-  password,
-  setPassword,
-  handleUpdateEmail,
-  emailError,
-  setEmailError,
   avatar,
-  setAvatar   
-}) {
+  setAvatar,
+  newPassword,
+  setNewPassword,
+  confirmPassword,
+  setConfirmPassword,
+  passwordError,
+  setPasswordError
+}){
     const handleImageChange = (e) => {
       const file = e.target.files[0];
 
@@ -67,43 +66,40 @@ function PersonalInfo({
         <div className="right">
           <div className="form-group">
             <label>Name</label>
-            <input
-              placeholder="Enter your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+            <p>{name}</p>
           </div>
 
-          <div className="email-row">
-            <div className="form-group email-input">
-              <label>Email</label>
-              <input
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-
-            <button
-              className="btn primary update-btn"
-              onClick={handleUpdateEmail}
-            >
-              Update Email
-            </button>
+                        <div className="form-group">
+            <label>Email</label>
+            <p>{email}</p>
           </div>
 
           <div className="form-group">
+            <label>New Password</label>
             <input
               type="password"
-              placeholder="Confirm Password"
-              value={password}
+              value={newPassword}
               onChange={(e) => {
-                setPassword(e.target.value);
-                setEmailError(""); // clears error while typing
-                }}
+                setNewPassword(e.target.value);
+                setPasswordError("");
+              }}
             />
-            {emailError && <p className="error">{emailError}</p>}
           </div>
+
+          <div className="form-group">
+            <label>Confirm Password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                setPasswordError("");
+              }}
+            />
+          </div>
+
+          {passwordError && <p className="error">{passwordError}</p>}
+
         </div>
       </div>
     </div>

@@ -8,13 +8,16 @@ import Actions from "../components/Actions";
 function Profile({ setUser }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  //const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   const [sessionLength, setSessionLength] = useState(30);
   const [studyTime, setStudyTime] = useState(2);
   const [accuracy, setAccuracy] = useState(2);
 
-  const [emailError, setEmailError] = useState("");
+  //const [emailError, setEmailError] = useState("");
 
   const [avatar, setAvatar] = useState("");
 
@@ -35,6 +38,7 @@ function Profile({ setUser }) {
       .catch(err => console.error("Connection failed:", err));
   }, []);
 
+  /*
   const handleSave = async () => {
     const data = { name, email, sessionLength, studyTime, accuracy, avatar };
     if (password) data.passwordHash = password;
@@ -63,16 +67,60 @@ function Profile({ setUser }) {
       alert("Backend not running!");
     }
   };
+  */
+
+  const handleSave = async () => {
+    if (newPassword && newPassword !== confirmPassword) {
+      setPasswordError("Passwords do not match");
+      return;
+    }
+
+    const data = { name, sessionLength, studyTime, accuracy, avatar };
+
+    if (newPassword) {
+      data.passwordHash = newPassword;
+    }
+
+    try {
+      const res = await fetch("http://localhost:5001/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        alert("Save failed");
+        return;
+      }
+
+      setUser(result);
+      alert("Profile saved!");
+
+      setNewPassword("");
+      setConfirmPassword("");
+      setPasswordError("");
+
+    } catch {
+      alert("Backend not running!");
+    }
+};
+
   const handleCancel = () => {
     setName("");
     setEmail("");
-    setPassword("");
     setSessionLength(30);
     setStudyTime(2);
     setAccuracy(2);
+
+    setNewPassword("");
+    setConfirmPassword("");
+    setPasswordError("");
+
   };
 
-
+/*
   const handleUpdateEmail = async () => {
     if (!password) {
       setEmailError("Enter password first");
@@ -102,7 +150,7 @@ function Profile({ setUser }) {
     alert("Update failed!");
   }
 };
-
+*/
   const getAccuracyLabel = () => {
     if (accuracy === 1) return "Low (I underestimate)";
     if (accuracy === 2) return "Medium";
@@ -116,14 +164,13 @@ function Profile({ setUser }) {
       <div className="profile-card">
         <PersonalInfo
           name={name}
-          setName={setName}
           email={email}
-          setEmail={setEmail}
-          password={password}
-          setPassword={setPassword}
-          handleUpdateEmail={handleUpdateEmail}
-          emailError={emailError}
-          setEmailError={setEmailError}
+          newPassword={newPassword}
+          setNewPassword={setNewPassword}
+          confirmPassword={confirmPassword}
+          setConfirmPassword={setConfirmPassword}
+          passwordError={passwordError}
+          setPasswordError={setPasswordError}
           avatar={avatar}
           setAvatar={setAvatar}
         />
