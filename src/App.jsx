@@ -5,13 +5,22 @@ import Profile from "./pages/Profile";
 import Analytics from "./pages/Analytics";
 import Dashboard from "./pages/Dashboard";
 import Navigation from "./Navigation";
+import React, { useState, useEffect } from "react";
 
 function TasksPage() {
   return <h1>Tasks Page</h1>;
 }
 
 function Layout() {
-  const user = { name: "student", email: "student@example.com" };
+  //const user = { name: "student", email: "student@example.com" };
+  const [user, setUser] = React.useState(null);
+
+  useEffect(() => {
+    fetch("http://localhost:5001/profile")
+      .then(res => res.json())
+      .then(data => setUser(data))
+      .catch(err => console.error(err));
+  }, []);
 
   return (
     <div className="dashboard-page">
@@ -21,7 +30,7 @@ function Layout() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/tasks" element={<TasksPage />} />
           <Route path="/analytics" element={<Analytics />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={<Profile setUser={setUser} />} />
         </Routes>
       </div>
     </div>

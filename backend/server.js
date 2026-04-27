@@ -37,7 +37,7 @@ app.get("/profile", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// SAVE PROFILE
+// save profile
 app.post("/profile", async (req, res) => {
   try {
     let user = await User.findOne();   // lways get first user
@@ -45,15 +45,22 @@ app.post("/profile", async (req, res) => {
     if (!user) {
       user = new User(req.body);       // create first time
     } else {
+      /*
       user.name = req.body.name;
       user.email = req.body.email;
       user.sessionLength = req.body.sessionLength;
       user.studyTime = req.body.studyTime;
       user.accuracy = req.body.accuracy;
+      
+
+      Object.assign(user, req.body);
 
       if (req.body.passwordHash) {
         user.passwordHash = req.body.passwordHash;
       }
+      */
+
+      Object.assign(user, req.body);
     }
 
     await user.save();
@@ -65,7 +72,7 @@ app.post("/profile", async (req, res) => {
   }
 });
 
-// UPDATE EMAIL
+// update profile
 app.put("/profile/email", async (req, res) => {
   try {
     const { email, password } = req.body;

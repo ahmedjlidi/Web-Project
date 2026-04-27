@@ -11,7 +11,23 @@ function PersonalInfo({
   handleUpdateEmail,
   emailError,
   setEmailError,
+  avatar,
+  setAvatar   
 }) {
+    const handleImageChange = (e) => {
+      const file = e.target.files[0];
+
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+          setAvatar(reader.result); // ase64 string
+        };
+
+        reader.readAsDataURL(file);
+      }
+    };
+
   return (
     <div className="section">
       <h3>Personal Info</h3>
@@ -19,10 +35,33 @@ function PersonalInfo({
       <div className="personal-row">
         <div className="left">
           <div className="avatar">
-            <User size={40} />
+            {/*<User size={40} />*/}
+              {avatar ? (
+                <img src={avatar} alt="avatar" className="avatar-img" />
+              ) : (
+                <User size={40} />
+              )}
+              {/* hidden file input*/}
+              <input
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                id="avatarInput"
+                onChange={handleImageChange}
+              />
           </div>
-          <button className="btn primary">Change</button>
-          <button className="btn">Remove</button>
+          <button
+            className="btn primary"
+            onClick={() => document.getElementById("avatarInput").click()}
+          >
+            Change
+          </button>
+          <button
+            className="btn"
+            onClick={() => setAvatar("")}
+          >
+            Remove
+          </button>
         </div>
 
         <div className="right">

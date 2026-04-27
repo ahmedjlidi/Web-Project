@@ -39,12 +39,17 @@ function Navigation({ user }) {
       <div className="sidebar-bottom">
         <div className="user-box">
           <div className="user-avatar">
-            {user?.name?.charAt(0).toUpperCase()}
+            {/*{user?.name?.charAt(0).toUpperCase()}*/}
+            {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
           </div>
 
           <div>
+            {/*
             <p className="user-name">{user?.name}</p>
             <p className="user-email">{user?.email}</p>
+            */}
+            <p className="user-name">{user?.name || "User"}</p>
+            <p className="user-email">{user?.email || "user@email.com"}</p>
           </div>
         </div>
 

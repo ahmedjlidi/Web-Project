@@ -5,7 +5,7 @@ import PersonalInfo from "../components/PersonalInfo";
 import StudyPreferences from "../components/StudyPreferences";
 import Actions from "../components/Actions";
 
-function Profile() {
+function Profile({ setUser }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,6 +15,8 @@ function Profile() {
   const [accuracy, setAccuracy] = useState(2);
 
   const [emailError, setEmailError] = useState("");
+
+  const [avatar, setAvatar] = useState("");
 
   // react asks backend for profile data and puts it in the input field
   useEffect(() => {
@@ -27,13 +29,14 @@ function Profile() {
           setSessionLength(data.sessionLength || 30);
           setStudyTime(data.studyTime || 2);
           setAccuracy(data.accuracy || 2);
+          setAvatar(data.avatar || "");
         }
       })
       .catch(err => console.error("Connection failed:", err));
   }, []);
 
   const handleSave = async () => {
-    const data = { name, email, sessionLength, studyTime, accuracy };
+    const data = { name, email, sessionLength, studyTime, accuracy, avatar };
     if (password) data.passwordHash = password;
 
     try {
@@ -51,7 +54,8 @@ function Profile() {
         return;
       }
 
-      console.log("Saved:", result); 
+      setUser(result);
+
       alert("Profile saved!");
       setPassword("");
     } catch (err) {
@@ -120,6 +124,8 @@ function Profile() {
           handleUpdateEmail={handleUpdateEmail}
           emailError={emailError}
           setEmailError={setEmailError}
+          avatar={avatar}
+          setAvatar={setAvatar}
         />
 
         <StudyPreferences
