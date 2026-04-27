@@ -1,0 +1,47 @@
+.admin-container {
+  padding: 30px;
+  font-family: Arial, sans-serif;
+}
+
+.admin-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.admin-subtitle {
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.admin-task-card {
+  background-color: white;
+  padding: 18px;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.admin-task-title {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.admin-task-info {
+  margin: 4px 0;
+  color: #555;
+}
+
+.admin-delete-btn {
+  margin-top: 10px;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.admin-delete-btn:hover {
+  background-color: #b91c1c;
+}

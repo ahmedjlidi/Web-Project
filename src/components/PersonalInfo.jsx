@@ -1,7 +1,7 @@
 import React from "react";
 import { User } from "lucide-react";
 import { EMAIL_REGEX } from '../components/validation'
-
+import { useEffect } from "react";
 
 function PersonalInfo({
   name,
@@ -46,7 +46,7 @@ function PersonalInfo({
     const emailErr = validateEmail(email)
     setEmailError(emailErr)
     setEmailValid(emailErr === '')
-  }, [email, isLogin])
+  }, [email])
 
 
   return (

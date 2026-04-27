@@ -1,21 +1,57 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import TaskList from "../components/TaskList";
+import AddTask from "../components/AddTask";
 import { useTasks } from "../components/TaskContext";
+import NotificationBanner from "../components/NotificationBanner";
 import "./Dashboard.css";
 
 function Dashboard() {
   const { tasks, setTasks } = useTasks();
   const [showAddTask, setShowAddTask] = useState(false);
 
+  useEffect(() => {
+    fetch("http://localhost:5001/api/tasks")
+      .then((res) => res.json())
+      .then((data) => {
+        const mappedTasks = data.map((task) => ({
+          taskID: task._id,
+          title: task.title,
+          estimatedDuration: task.estimatedTime,
+          deadline: task.deadline
+            ? new Date(task.deadline).toLocaleString()
+            : "",
+          difficulty: task.difficulty,
+          priority:
+            task.priority === "Low"
+              ? 1
+              : task.priority === "Medium"
+              ? 2
+              : 3,
+          category: task.category,
+          notes: task.notes,
+          createdAt: task.createdAt,
+          updatedAt: task.updatedAt,
+          currentProgress: task.progress || task.currentProgress || 0,
+        }));
+
+        setTasks(mappedTasks);
+      })
+      .catch((err) => console.log("Error loading tasks:", err));
+  }, [setTasks]);
+
   const activeTasks = tasks.filter((task) => task.currentProgress < 100);
   const completedTasks = tasks.filter((task) => task.currentProgress >= 100);
 
-  const pendingTasksCount = tasks.filter((task) => task.currentProgress === 0).length;
+  const pendingTasksCount = tasks.filter(
+    (task) => task.currentProgress === 0
+  ).length;
+
   const activeTasksCount = activeTasks.length;
 
   return (
     <>
+      <NotificationBanner />
       <div className="dashboard-header">
         <div>
           <h1>Welcome back, student</h1>
@@ -30,6 +66,13 @@ function Dashboard() {
         >
           + New Task
         </Button>
+
+        {showAddTask && (
+          <AddTask
+            setTasks={setTasks}
+            onClose={() => setShowAddTask(false)}
+          />
+        )}
       </div>
 
       <div className="stats-grid">

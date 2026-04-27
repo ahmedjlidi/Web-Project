@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import Navigation from "./Navigation";
 import React, { useEffect } from "react";
 import FocusSession from "./pages/FocusSession";
+import AdminPanel from "./AdminPanel/AdminPanel";
 
 function TasksPage() {
   return <h1>Tasks Page</h1>;
@@ -22,6 +23,8 @@ function Layout() {
       .catch((err) => console.error(err));
   }, []);
 
+  const isAdmin = user?.email?.endsWith("@admin.com");
+
   return (
     <div className="dashboard-page">
       <Navigation user={user} />
@@ -33,6 +36,17 @@ function Layout() {
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/profile" element={<Profile setUser={setUser} />} />
           <Route path="/focus-session/:taskID" element={<FocusSession />} />
+
+          <Route
+            path="/admin"
+            element={
+              isAdmin ? (
+                <AdminPanel />
+              ) : (
+                <h2 style={{ padding: "20px" }}>Access Denied</h2>
+              )
+            }
+          />
         </Routes>
       </div>
     </div>
