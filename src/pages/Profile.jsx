@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
-import "./Profile.css";
-import { User } from "lucide-react";
+import "../pages/Profile.css";
+
+import PersonalInfo from "../components/PersonalInfo";
+import StudyPreferences from "../components/StudyPreferences";
+import Actions from "../components/Actions";
 
 function Profile() {
   const [name, setName] = useState("");
@@ -11,31 +14,51 @@ function Profile() {
   const [studyTime, setStudyTime] = useState(2);
   const [accuracy, setAccuracy] = useState(2);
 
-  useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("profile"));
+  const [emailError, setEmailError] = useState("");
 
-    if (saved) {
-      setName(saved.name || "");
-      setEmail(saved.email || "");
-      setSessionLength(saved.sessionLength || 30);
-      setStudyTime(saved.studyTime || 2);
-      setAccuracy(saved.accuracy || 2);
-    }
+  // react asks backend for profile data and puts it in the input field
+  useEffect(() => {
+    fetch("http://localhost:5001/profile")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && typeof data === "object") {
+          setName(data.name || "");
+          setEmail(data.email || "");
+          setSessionLength(data.sessionLength || 30);
+          setStudyTime(data.studyTime || 2);
+          setAccuracy(data.accuracy || 2);
+        }
+      })
+      .catch(err => console.error("Connection failed:", err));
   }, []);
 
-  const handleSave = () => {
-    const data = {
-      name,
-      email,
-      sessionLength,
-      studyTime,
-      accuracy,
-    };
+  const handleSave = async () => {
+    const data = { name, email, sessionLength, studyTime, accuracy };
+    if (password) data.passwordHash = password;
 
-    localStorage.setItem("profile", JSON.stringify(data));
-    alert("Profile saved!");
+    try {
+      const res = await fetch("http://localhost:5001/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        console.error(result);    
+        alert("Save failed: " + result.error);
+        return;
+      }
+
+      console.log("Saved:", result); 
+      alert("Profile saved!");
+      setPassword("");
+    } catch (err) {
+      console.error(err);
+      alert("Backend not running!");
+    }
   };
-
   const handleCancel = () => {
     setName("");
     setEmail("");
@@ -45,13 +68,36 @@ function Profile() {
     setAccuracy(2);
   };
 
-  const handleUpdateEmail = () => {
+
+  const handleUpdateEmail = async () => {
     if (!password) {
-      alert("Enter password to update email");
+      setEmailError("Enter password first");
       return;
     }
+
+  try {
+    const res = await fetch("http://localhost:5001/profile/email", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      setEmailError(result.error);
+      return;
+    }
+
     alert("Email updated!");
-  };
+    setEmailError("");
+  } catch (err) {
+    console.error(err);
+    alert("Update failed!");
+  }
+};
 
   const getAccuracyLabel = () => {
     if (accuracy === 1) return "Low (I underestimate)";
@@ -64,121 +110,32 @@ function Profile() {
       <h2 className="title">Profile Settings</h2>
 
       <div className="profile-card">
-        <div className="section">
-          <h3>Personal Info</h3>
+        <PersonalInfo
+          name={name}
+          setName={setName}
+          email={email}
+          setEmail={setEmail}
+          password={password}
+          setPassword={setPassword}
+          handleUpdateEmail={handleUpdateEmail}
+          emailError={emailError}
+          setEmailError={setEmailError}
+        />
 
-          <div className="personal-row">
-            <div className="left">
-              <div className="avatar">
-                <User size={40} />
-              </div>
-              <button className="btn primary">Change</button>
-              <button className="btn">Remove</button>
-            </div>
+        <StudyPreferences
+          sessionLength={sessionLength}
+          setSessionLength={setSessionLength}
+          studyTime={studyTime}
+          setStudyTime={setStudyTime}
+          accuracy={accuracy}
+          setAccuracy={setAccuracy}
+          getAccuracyLabel={getAccuracyLabel}
+        />
 
-            <div className="right">
-              <div className="form-group">
-                <label>Name</label>
-                <input
-                  type="text"
-                  placeholder="Enter your name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-
-              <div className="email-row">
-                <div className="form-group email-input">
-                  <label>Email</label>
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-
-                <button
-                  className="btn primary update-btn"
-                  onClick={handleUpdateEmail}
-                >
-                  Update Email
-                </button>
-              </div>
-
-              <div className="form-group">
-                <input
-                  type="password"
-                  placeholder="Confirm Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                {!password && (
-                  <p className="error">
-                    You need to enter your password to change your email.
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="section">
-          <h3>Study Preferences</h3>
-
-          <div className="form-group">
-            <label>
-              Session Length: {sessionLength} min (
-              {(sessionLength / 60).toFixed(1)} hrs)
-            </label>
-            <input
-              type="range"
-              min="5"
-              max="180"
-              step="5"
-              value={sessionLength}
-              onChange={(e) => setSessionLength(Number(e.target.value))}
-              className="slider"
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Daily Study Time: {studyTime} hours</label>
-            <input
-              type="range"
-              min="1"
-              max="8"
-              step="1"
-              value={studyTime}
-              onChange={(e) => setStudyTime(Number(e.target.value))}
-              className="slider"
-            />
-          </div>
-
-          <div className="form-group">
-            <label>
-              Time Estimation Accuracy: {getAccuracyLabel()}
-            </label>
-            <input
-              type="range"
-              min="1"
-              max="3"
-              step="1"
-              value={accuracy}
-              onChange={(e) => setAccuracy(Number(e.target.value))}
-              className="slider"
-            />
-          </div>
-        </div>
-
-        <div className="actions">
-          <button className="btn" onClick={handleCancel}>
-            Cancel
-          </button>
-          <button className="btn primary" onClick={handleSave}>
-            Save
-          </button>
-        </div>
+        <Actions
+          handleCancel={handleCancel}
+          handleSave={handleSave}
+        />
       </div>
     </div>
   );
