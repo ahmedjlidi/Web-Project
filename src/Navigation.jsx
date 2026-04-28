@@ -25,7 +25,7 @@ function Navigation({ user }) {
           >
             Dashboard
           </Nav.Link>
-
+          {/*
           <Nav.Link
             as={Link}
             to="/tasks"
@@ -33,7 +33,7 @@ function Navigation({ user }) {
           >
             Tasks
           </Nav.Link>
-
+          */}
           <Nav.Link
             as={Link}
             to="/analytics"

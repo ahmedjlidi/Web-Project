@@ -92,3 +92,23 @@
     color: #9ca3af;
     cursor: not-allowed;
 }
+
+.focus-pause-button,
+.focus-resume-button {
+    border: none;
+    padding: 14px 28px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.focus-pause-button {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.focus-resume-button {
+    background-color: #16a34a;
+    color: white;
+}

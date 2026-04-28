@@ -87,6 +87,14 @@ function FocusSession() {
         navigate("/dashboard");
     }
 
+    function handlePause() {
+        setIsRunning(false);
+    }
+
+    function handleResume() {
+        setIsRunning(true);
+    }
+
     if (!selectedTask) {
         return (
             <div className="focus-session-page">
@@ -140,6 +148,42 @@ function FocusSession() {
                     <button
                         className="focus-start-button"
                         onClick={handleStart}
+                        disabled={isRunning || seconds > 0}
+                    >
+                        Start
+                    </button>
+
+                    {isRunning ? (
+                        <button
+                            className="focus-pause-button"
+                            onClick={handlePause}
+                        >
+                            Pause
+                        </button>
+                    ) : (
+                        seconds > 0 && (
+                            <button
+                                className="focus-resume-button"
+                                onClick={handleResume}
+                            >
+                                Resume
+                            </button>
+                        )
+                    )}
+
+                    <button
+                        className="focus-end-button"
+                        onClick={handleEnd}
+                        disabled={seconds === 0}
+                    >
+                        End Session
+                    </button>
+                </div>
+                {/*
+                <div className="focus-actions">
+                    <button
+                        className="focus-start-button"
+                        onClick={handleStart}
                         disabled={isRunning}
                     >
                         Start
@@ -153,6 +197,7 @@ function FocusSession() {
                         End Session
                     </button>
                 </div>
+                */}
             </div>
         </div>
     );

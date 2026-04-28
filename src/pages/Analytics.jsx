@@ -219,7 +219,7 @@ function Analytics() {
             <XAxis dataKey="status" />
             <YAxis allowDecimals={false} />
             <Tooltip />
-            <Bar dataKey="count" />
+            <Bar dataKey="count" fill="#2563eb"/>
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -236,6 +236,7 @@ function Analytics() {
             <Line
               type="monotone"
               dataKey="minutes"
+              stroke="#2563eb"
               strokeWidth={2}
             />
           </LineChart>
@@ -252,8 +253,8 @@ function Analytics() {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="estimated" name="Estimated Time" />
-            <Bar dataKey="actual" name="Actual Time" />
+            <Bar dataKey="estimated" name="Estimated Time" fill="#60a5fa"/>
+            <Bar dataKey="actual" name="Actual Time" fill="#10b981" />
           </BarChart>
         </ResponsiveContainer>
       </div>
