@@ -1,5 +1,20 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+
+const generateToken = (user) => {
+    return jwt.sign(
+        {
+            id: user._id,
+            username: user.username
+        },
+        process.env.JWT_SECRET,
+        {
+            expiresIn: "1d"
+        }
+    );
+};
 
 exports.signup = async (req, res) => {
     try {
@@ -11,7 +26,9 @@ exports.signup = async (req, res) => {
             });
         }
 
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({
+            $or: [{ username }, { email }]
+        });
 
         if (existingUser) {
             return res.status(400).json({
@@ -76,8 +93,10 @@ exports.login = async (req, res) => {
             });
         }
 
+        const token = generateToken(user);
         res.status(200).json({
             message: "Login successful",
+            token,
             user: {
                 id: user._id,
                 username: user.username,

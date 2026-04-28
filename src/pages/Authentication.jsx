@@ -219,8 +219,18 @@ function Authentication({ state }) {
             setSuccess(true)
 
             if (isLogin) {
-                localStorage.setItem("user", JSON.stringify(data.user))
-                navigate("/dashboard")
+                if (!data.token) {
+                    throw new Error("No token returned from server");
+                }
+
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("user", JSON.stringify(data.user));
+
+
+                let test = localStorage.getItem("token")
+                console.log(test)
+
+                navigate("/dashboard");
             } else {
                 resetForm(true)
                 setCurrState("login")
