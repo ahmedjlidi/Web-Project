@@ -196,7 +196,7 @@ function PersonalInfo({
             <p>{name}</p>
           </div>
 
-                        <div className="form-group">
+            <div className="form-group">
             <label>Email</label>
             <p>{email}</p>
           </div>

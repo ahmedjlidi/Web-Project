@@ -62,36 +62,6 @@ function Profile({ setUser }) {
       })
       .catch(err => console.error("Connection failed:", err));
 }, []);
-  /*
-  const handleSave = async () => {
-    const data = { name, email, sessionLength, studyTime, accuracy, avatar };
-    if (password) data.passwordHash = password;
-
-    try {
-      const res = await fetch("http://localhost:5001/profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        console.error(result);
-        alert("Save failed: " + result.error);
-        return;
-      }
-
-      setUser(result);
-
-      alert("Profile saved!");
-      setPassword("");
-    } catch (err) {
-      console.error(err);
-      alert("Backend not running!");
-    }
-  };
-  */
 
   const handleSave = async () => {
     if (newPassword && newPassword !== confirmPassword) {
@@ -141,14 +111,12 @@ function Profile({ setUser }) {
       }
 
       setUser(result);
-      alert("Profile saved!");
+      //alert("Profile saved!");
 
       setNewPassword("");
       setConfirmPassword("");
       setPasswordError("");
 
-    } catch {
-      alert("Backend not running!");
     }
   };
 
@@ -164,46 +132,6 @@ function Profile({ setUser }) {
     setPasswordError("");
 
   };
-
-  /*
-    const handleUpdateEmail = async () => {
-      if (!password) {
-        setEmailError("Enter password first");
-        return;
-      }
-  
-      try {
-        const res = await fetch("http://localhost:5001/profile/email", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        });
-  
-        const result = await res.json();
-  
-        if (!res.ok) {
-          setEmailError(result.error);
-          return;
-        }
-  
-        alert("Email updated!");
-        setEmailError("");
-      } catch (err) {
-        console.error(err);
-        alert("Update failed!");
-      }
-    };
-  
-      alert("Email updated!");
-      setEmailError("");
-    } catch (err) {
-      console.error(err);
-      alert("Update failed!");
-    }
-  };
-  */
 
 
   const getAccuracyLabel = () => {

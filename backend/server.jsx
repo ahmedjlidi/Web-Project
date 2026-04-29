@@ -206,17 +206,6 @@ app.delete("/api/tasks/:id", async (req, res) => {
   }
 });
 
-/*
-app.get("/profile", async (req, res) => {
-  try {
-    const user = await User.findOne().lean();
-    res.json(user || {});
-  } catch (err) {
-    console.log("PROFILE ERROR:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-*/
 app.get("/profile", protect, async (req, res) => {
   try {
     res.json(req.user);
@@ -226,25 +215,6 @@ app.get("/profile", protect, async (req, res) => {
   }
 });
 
-/*
-app.post("/profile", async (req, res) => {
-  try {
-    let user = await User.findOne();
-
-    if (!user) {
-      user = new User(req.body);
-    } else {
-      Object.assign(user, req.body);
-    }
-
-    await user.save();
-    res.json(user);
-  } catch (err) {
-    console.log("SAVE ERROR:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-*/
 app.post("/profile", protect, async (req, res) => {
   try {
     let user = await User.findById(req.user._id);
@@ -260,34 +230,6 @@ app.post("/profile", protect, async (req, res) => {
   }
 });
 
-/*
-app.put("/profile/email", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await User.findOne();
-
-    if (!user) {
-      return res.status(404).json({ error: "No user found" });
-    }
-
-    if (!password) {
-      return res.status(400).json({ error: "Password required" });
-    }
-
-    if (password !== user.passwordHash) {
-      return res.status(400).json({ error: "Wrong password" });
-    }
-
-    user.email = email;
-    await user.save();
-
-    res.json(user);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-*/
 
 app.put("/profile/email", protect, async (req, res) => {
   try {
