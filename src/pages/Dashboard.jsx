@@ -11,34 +11,38 @@ function Dashboard() {
   const [showAddTask, setShowAddTask] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:5001/api/tasks")
-      .then((res) => res.json())
-      .then((data) => {
-        const mappedTasks = data.map((task) => ({
-          taskID: task._id,
-          title: task.title,
-          estimatedDuration: task.estimatedTime,
-          deadline: task.deadline
-            ? new Date(task.deadline).toLocaleString()
-            : "",
-          difficulty: task.difficulty,
-          priority:
-            task.priority === "Low"
-              ? 1
-              : task.priority === "Medium"
-              ? 2
-              : 3,
-          category: task.category,
-          notes: task.notes,
-          createdAt: task.createdAt,
-          updatedAt: task.updatedAt,
-          currentProgress: task.progress || task.currentProgress || 0,
-        }));
+  const token = sessionStorage.getItem("token");
 
-        setTasks(mappedTasks);
-      })
-      .catch((err) => console.log("Error loading tasks:", err));
-  }, [setTasks]);
+  if (!token) return;
+
+  fetch("http://localhost:5001/api/tasks", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      const mappedTasks = data.map((task) => ({
+        taskID: task._id,
+        userID: task.userID,
+        title: task.title,
+        estimatedDuration: task.estimatedDuration,
+        deadline: task.deadline
+          ? new Date(task.deadline).toLocaleString()
+          : "",
+        difficulty: task.difficulty,
+        priority: Number(task.priority),
+        category: task.category,
+        notes: task.notes,
+        createdAt: task.createdAt,
+        updatedAt: task.updatedAt,
+        currentProgress: task.currentProgress || 0,
+      }));
+
+      setTasks(mappedTasks);
+    })
+    .catch((err) => console.log("Error loading tasks:", err));
+}, [setTasks]);
 
   const activeTasks = tasks.filter((task) => task.currentProgress < 100);
   const completedTasks = tasks.filter((task) => task.currentProgress >= 100);

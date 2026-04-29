@@ -17,13 +17,20 @@ function Layout() {
   const [user, setUser] = React.useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5001/profile")
-      .then((res) => res.json())
-      .then((data) => setUser(data))
-      .catch((err) => console.error(err));
-  }, []);
+  const token = sessionStorage.getItem("token");
+  if (!token) return;
 
-  const isAdmin = user?.email?.endsWith("@admin.com");
+  fetch("http://localhost:5001/api/profile/me", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => setUser(data))
+    .catch((err) => console.error(err));
+}, []);
+
+const isAdmin = user?.role === "admin";
 
   return (
     <div className="dashboard-page">

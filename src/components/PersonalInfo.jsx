@@ -42,12 +42,12 @@ function PersonalInfo({
     return ''
   }
 
-  useEffect(() => {
+  /*useEffect(() => {
     const emailErr = validateEmail(email)
     setEmailError(emailErr)
     setEmailValid(emailErr === '')
   }, [email])
-
+*/
 
   return (
     <div className="section">

@@ -4,12 +4,18 @@ import "./AdminPanel.css";
 function AdminPanel() {
   const [tasks, setTasks] = useState([]);
 
-  useEffect(() => {
-    fetch("http://localhost:5001/api/tasks")
-      .then((res) => res.json())
-      .then((data) => setTasks(data))
-      .catch((err) => console.log(err));
-  }, []);
+useEffect(() => {
+  const token = sessionStorage.getItem("token");
+
+  fetch("http://localhost:5001/api/tasks", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+    .then((res) => res.json())
+    .then((data) => setTasks(data))
+    .catch((err) => console.log(err));
+}, []);
 
   async function handleDelete(id) {
   const confirmDelete = window.confirm("Delete this task?");

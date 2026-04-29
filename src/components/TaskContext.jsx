@@ -3,7 +3,7 @@ import { createContext, useContext, useState } from "react";
 const TaskContext = createContext();
 
 export function TaskProvider({ children }) {
-    const [tasks, setTasks] = useState([
+   /* const [tasks, setTasks] = useState([
         {
             taskID: 101,
             userID: 1,
@@ -33,7 +33,8 @@ export function TaskProvider({ children }) {
             currentProgress: 0
         }
     ]);
-
+*/
+    const [tasks, setTasks] = useState([]);
     return (
         <TaskContext.Provider value={{ tasks, setTasks }}>
             {children}

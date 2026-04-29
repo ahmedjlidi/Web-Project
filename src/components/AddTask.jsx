@@ -10,7 +10,7 @@ function AddTask({ setTasks, onClose }) {
     const [category, setCategory] = useState("");
     const [notes, setNotes] = useState("");
 
-    function handleSubmit(e) {
+   /* function handleSubmit(e) {
         e.preventDefault();
 
         const newTask = {
@@ -38,7 +38,57 @@ function AddTask({ setTasks, onClose }) {
         setCategory("");
 
         if (onClose) onClose();
+    }*/
+   async function handleSubmit(e) {
+  e.preventDefault();
+
+  const token = sessionStorage.getItem("token");
+
+  if (!token) {
+    alert("You must login first");
+    return;
+  }
+
+  const newTask = {
+    title,
+    estimatedDuration: Number(estimatedDuration),
+    deadline,
+    difficulty: Number(difficulty),
+    priority: Number(priority),
+    category,
+    notes
+  };
+
+  try {
+    const res = await fetch("http://localhost:5001/api/tasks", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(newTask)
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "Failed to create task");
+      return;
     }
+
+    setTasks((prev) => [...prev, {
+      ...data,
+      taskID: data._id,
+      currentProgress: data.currentProgress || 0
+    }]);
+
+    onClose();
+
+  } catch (err) {
+    console.error(err);
+    alert("Server error");
+  }
+}
 
     return (
         <div className="add-task-overlay">

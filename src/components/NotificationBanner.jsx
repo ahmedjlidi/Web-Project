@@ -7,15 +7,26 @@ function NotificationBanner() {
   useEffect(() => {
     async function checkStudyGoal() {
       try {
-        const res = await fetch("http://localhost:5001/profile");
+        const token = sessionStorage.getItem("token");
+
+        if (!token) return;
+
+        const res = await fetch("http://localhost:5001/api/profile/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         const profile = await res.json();
 
-        if (!profile || !profile.studyTime) return;
+        if (!res.ok) return;
 
-        localStorage.setItem("profile", JSON.stringify(profile));
+        if (!profile || profile.averageDailyStudyTime === undefined) return;
+        sessionStorage.setItem("profile", JSON.stringify(profile));
 
-        const requiredMinutes = Number(profile.studyTime) * 60;
-        const studiedToday = Number(localStorage.getItem("studiedToday")) || 0;
+        const requiredMinutes = Number(profile.averageDailyStudyTime || 2) * 60;
+        const studiedToday =
+          Number(sessionStorage.getItem("studiedToday")) || 0;
 
         if (studiedToday < requiredMinutes) {
           setMessage(

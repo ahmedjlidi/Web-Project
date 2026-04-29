@@ -10,7 +10,7 @@ function FocusSession() {
     const { tasks, setTasks } = useTasks();
 
     const selectedTask = tasks.find(
-        (task) => task.taskID === Number(taskID)
+        (task) => task.taskID === taskID
     );
 
     const [seconds, setSeconds] = useState(0);
@@ -65,27 +65,54 @@ function FocusSession() {
         navigate("/dashboard");
     }
 
-    function handleSubmitSurvey(sessionData) {
-        console.log("Session data ready to save:", sessionData);
+async function handleSubmitSurvey(sessionData) {
+  try {
+    const res = await fetch(
+      `http://localhost:5001/api/tasks/${taskID}/progress`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          progress: sessionData.progressAfter,
+        }),
+      }
+    );
 
-        setTasks((prevTasks) =>
-            prevTasks.map((task) =>
-                task.taskID === Number(taskID)
-                    ? {
-                        ...task,
-                        currentProgress: sessionData.progressAfter,
-                        updatedAt: new Date().toISOString(),
-                        completedAt:
-                            sessionData.progressAfter >= 100
-                                ? new Date().toISOString()
-                                : task.completedAt || null
-                    }
-                    : task
-            )
-        );
+    const updatedTask = await res.json();
 
-        navigate("/dashboard");
+    if (!res.ok) {
+      alert(updatedTask.message || "Failed to save progress");
+      return;
     }
+
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.taskID === taskID
+          ? {
+              ...task,
+              currentProgress: updatedTask.currentProgress,
+              updatedAt: updatedTask.updatedAt,
+              completedAt: updatedTask.completedAt,
+            }
+          : task
+      )
+    );
+
+    navigate("/dashboard");
+    const oldStudiedToday =
+  Number(sessionStorage.getItem("studiedToday")) || 0;
+
+const newStudiedToday = oldStudiedToday + sessionData.duration;
+
+sessionStorage.setItem("studiedToday", newStudiedToday);
+  } catch (err) {
+    console.error(err);
+    alert("Server error");
+  }
+}
 
     function handlePause() {
         setIsRunning(false);

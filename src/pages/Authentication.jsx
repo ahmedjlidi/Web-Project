@@ -223,11 +223,11 @@ function Authentication({ state }) {
                     throw new Error("No token returned from server");
                 }
 
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("user", JSON.stringify(data.user));
+                sessionStorage.setItem("token", data.token);
+                sessionStorage.setItem("user", JSON.stringify(data.user));
 
-
-                let test = localStorage.getItem("token")
+                let test = sessionStorage.getItem("token");
+                console.log(test);
                 console.log(test)
 
                 navigate("/dashboard");

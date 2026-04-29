@@ -6,9 +6,11 @@ function Navigation({ user }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isAdmin = user?.email?.endsWith("@admin.com");
+  const isAdmin = user?.role === "admin";
 
   function handleSignOut() {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
     navigate("/");
   }
 
@@ -65,11 +67,11 @@ function Navigation({ user }) {
       <div className="sidebar-bottom">
         <div className="user-box">
           <div className="user-avatar">
-            {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+            {user?.username ? user.username.charAt(0).toUpperCase() : "U"}
           </div>
 
           <div>
-            <p className="user-name">{user?.name || "User"}</p>
+            <p className="user-name">{user?.username || "User"}</p>
             <p className="user-email">{user?.email || "user@email.com"}</p>
           </div>
         </div>
