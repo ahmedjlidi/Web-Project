@@ -1,0 +1,94 @@
+.survey-card {
+    width: 520px;
+    background-color: #ffffff;
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.survey-card h2 {
+    margin: 0 0 8px;
+    font-size: 26px;
+    color: #111827;
+}
+
+.survey-description {
+    margin: 0 0 22px;
+    color: #6b7280;
+    font-size: 15px;
+}
+
+.survey-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.survey-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.survey-field label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.survey-field input,
+.survey-field select {
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 15px;
+    outline: none;
+}
+
+.survey-field input:focus,
+.survey-field select:focus {
+    border-color: #2563eb;
+}
+
+.survey-summary {
+    background-color: #f9fafb;
+    border-radius: 16px;
+    padding: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+}
+
+.survey-summary p {
+    margin: 0;
+    color: #4b5563;
+    font-size: 14px;
+}
+
+.survey-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.survey-cancel,
+.survey-submit {
+    border: none;
+    border-radius: 12px;
+    padding: 11px 18px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.survey-cancel {
+    background-color: #e5e7eb;
+    color: #374151;
+}
+
+.survey-submit {
+    background-color: #2563eb;
+    color: white;
+}

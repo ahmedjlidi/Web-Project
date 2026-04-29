@@ -1,0 +1,114 @@
+.focus-session-page {
+    min-height: 100vh;
+    background-color: #f4f7fb;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #111827;
+    padding: 32px;
+}
+
+.focus-session-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.focus-back-button {
+    border: none;
+    background-color: #ffffff;
+    color: #374151;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.focus-back-button:hover {
+    background-color: #e5e7eb;
+}
+
+.focus-task-id {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.focus-session-content {
+    min-height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+}
+
+.focus-session-content h1 {
+    font-size: 34px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.focus-timer {
+    font-size: 86px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    background-color: #ffffff;
+    padding: 36px 56px;
+    border-radius: 28px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.focus-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.focus-start-button,
+.focus-end-button {
+    border: none;
+    padding: 14px 28px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.focus-start-button {
+    background-color: #2563eb;
+    color: white;
+}
+
+.focus-start-button:disabled {
+    background-color: #93c5fd;
+    cursor: not-allowed;
+}
+
+.focus-end-button {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.focus-end-button:disabled {
+    background-color: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.focus-pause-button,
+.focus-resume-button {
+    border: none;
+    padding: 14px 28px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.focus-pause-button {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.focus-resume-button {
+    background-color: #16a34a;
+    color: white;
+}
