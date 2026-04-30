@@ -23,27 +23,27 @@ function Profile({ setUser }) {
   const [avatar, setAvatar] = useState("");
 
   // react asks backend for profile data and puts it in the input field
-useEffect(() => {
-  const token = sessionStorage.getItem("token");
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
 
-  if (!token) return;
+    if (!token) return;
 
-  fetch("http://localhost:5001/api/profile/me", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      setName(data.username || "");
-      setEmail(data.email || "");
-      setSessionLength(data.preferredSessionLength || 30);
-      setStudyTime(data.averageDailyStudyTime || 2);
-      setAccuracy(data.accuracy || 0);
-      setAvatar(data.avatar || "");
+    fetch("http://localhost:5001/api/profile/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
-    .catch((err) => console.error("Connection failed:", err));
-}, []);
+      .then((res) => res.json())
+      .then((data) => {
+        setName(data.username || "");
+        setEmail(data.email || "");
+        setSessionLength(data.preferredSessionLength || 30);
+        setStudyTime(data.averageDailyStudyTime || 2);
+        setAccuracy(data.accuracy || 0);
+        setAvatar(data.avatar || "");
+      })
+      .catch((err) => console.error("Connection failed:", err));
+  }, []);
 
   /*
   const handleSave = async () => {
@@ -82,7 +82,7 @@ useEffect(() => {
       return;
     }
 
-    const data = {username: name,preferredSessionLength: sessionLength,averageDailyStudyTime: studyTime,accuracy,avatar,};
+    const data = { username: name, preferredSessionLength: sessionLength, averageDailyStudyTime: studyTime, accuracy, avatar, };
 
     if (newPassword) {
       data.passwordHash = newPassword;
@@ -90,13 +90,13 @@ useEffect(() => {
 
     try {
       const res = await fetch("http://localhost:5001/api/profile/me", {
-  method: "PUT",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-  },
-  body: JSON.stringify(data),
-});
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(data),
+      });
 
       const result = await res.json();
 

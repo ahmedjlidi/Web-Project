@@ -1,11 +1,12 @@
 const express = require("express");
 const Task = require("../models/Task");
+const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get("/", protect, async (req, res) => {
   try {
-    const tasks = await Task.find().sort({ createdAt: -1 });
+    const tasks = await Task.find({ userID: req.user._id }).sort({ createdAt: -1 });
     res.json(tasks);
   } catch (error) {
     res.status(500).json({ message: "Failed to get tasks" });
@@ -46,20 +47,25 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", protect, async (req, res) => {
   try {
     if (!req.body.title) {
       return res.status(400).json({ message: "Task title is required" });
     }
 
-    const task = await Task.create(req.body);
+    const task = await Task.create({
+      ...req.body,
+      userID: req.user._id,
+      currentProgress: 0
+    });
 
     res.status(201).json({
       message: "Task created successfully",
       task
     });
   } catch (error) {
-    res.status(500).json({ message: "Failed to create task" });
+    console.error("Create task error:", error);
+    res.status(500).json({ message: error.message || "Failed to create task" });
   }
 });
 
