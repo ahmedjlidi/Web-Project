@@ -24,6 +24,10 @@ router.put("/me", protect, async (req, res) => {
       req.body.averageDailyStudyTime ?? user.averageDailyStudyTime;
     user.accuracy = req.body.accuracy ?? user.accuracy;
 
+    if (req.body.password) {
+      const bcrypt = require("bcryptjs");
+      user.passwordHash = await bcrypt.hash(req.body.password, 10);
+    }
     const updatedUser = await user.save();
 
     res.json({

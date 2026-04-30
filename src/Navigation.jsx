@@ -64,17 +64,21 @@ function Navigation({ user }) {
         </Nav>
       </div>
 
-      <div className="sidebar-bottom">
-        <div className="user-box">
-          <div className="user-avatar">
-            {user?.username ? user.username.charAt(0).toUpperCase() : "U"}
-          </div>
+        <div className="sidebar-bottom">
+          <div className="user-box">
+            <div className="user-avatar">
+              {user?.avatar ? (
+                <img src={user.avatar} className="avatar-img" />
+              ) : (
+                user?.username?.charAt(0).toUpperCase()
+              )}
+            </div>
 
-          <div>
-            <p className="user-name">{user?.username || "User"}</p>
-            <p className="user-email">{user?.email || "user@email.com"}</p>
+            <div className="user-info"> 
+              <p className="user-name">{user?.username}</p>
+              <p className="user-email">{user?.email}</p>
+            </div>
           </div>
-        </div>
 
         <button className="signout-btn" onClick={handleSignOut}>
           Sign Out
