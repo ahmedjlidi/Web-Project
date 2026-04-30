@@ -77,19 +77,32 @@ function Profile({ setUser }) {
   */
 
   const handleSave = async () => {
-    if (newPassword && newPassword !== confirmPassword) {
-      setPasswordError("Passwords do not match");
-      return;
+    if (newPassword || confirmPassword) {
+      const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+      if (!PASSWORD_REGEX.test(newPassword)) {
+        setPasswordError(
+          "Password must be at least 8 characters, include a capital letter and a number"
+        );
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        setPasswordError("Passwords do not match");
+        return;
+      }
     }
 
-    const data = { username: name, preferredSessionLength: sessionLength, averageDailyStudyTime: studyTime, accuracy, avatar, };
+
+    const data = { username: name, email, preferredSessionLength: sessionLength, averageDailyStudyTime: studyTime, accuracy, avatar };
 
     if (newPassword) {
-      data.passwordHash = newPassword;
+      data.password = newPassword;
     }
 
     try {
       const res = await fetch("http://localhost:5001/api/profile/me", {
+
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -106,7 +119,7 @@ function Profile({ setUser }) {
       }
 
       setUser(result);
-      alert("Profile saved!");
+      //alert("Profile saved!");
 
       setNewPassword("");
       setConfirmPassword("");
@@ -184,13 +197,14 @@ function Profile({ setUser }) {
       <div className="profile-card">
         <PersonalInfo
           name={name}
+          setName={setName}
           email={email}
+          setEmail={setEmail}
           newPassword={newPassword}
           setNewPassword={setNewPassword}
           confirmPassword={confirmPassword}
           setConfirmPassword={setConfirmPassword}
           passwordError={passwordError}
-          setPasswordError={setPasswordError}
           avatar={avatar}
           setAvatar={setAvatar}
         />

@@ -193,24 +193,35 @@ function PersonalInfo({
         <div className="right">
           <div className="form-group">
             <label>Name</label>
-            <p>{name}</p>
+
+            <p className="static-field">{name}</p>
           </div>
 
           <div className="form-group">
             <label>Email</label>
-            <p>{email}</p>
+
+            <p className="static-field">{email}</p>
           </div>
 
           <div className="form-group">
             <label>New Password</label>
             <input
               type="password"
+              placeholder="Enter new password"
               value={newPassword}
-              onChange={(e) => {
-                setNewPassword(e.target.value);
-                setPasswordError("");
-              }}
+              onChange={(e) => setNewPassword(e.target.value)}
             />
+          </div>
+
+          <div className="form-group">
+            <label>Confirm Password</label>
+            <input
+              type="password"
+              placeholder="Confirm new password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+            {passwordError && <p className="error">{passwordError}</p>}
           </div>
 
           <div className="form-group">
