@@ -20,7 +20,16 @@ function Dashboard() {
       Authorization: `Bearer ${token}`,
     },
   })
-    .then((res) => res.json())
+    .then(async (res) => {
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.log("Tasks error:", data.message);
+        return [];
+      }
+
+      return data;
+    })
     .then((data) => {
       const mappedTasks = data.map((task) => ({
         taskID: task._id,

@@ -24,12 +24,15 @@ useEffect(() => {
   try {
     const res = await fetch(`http://localhost:5001/api/tasks/${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      },
     });
 
     const data = await res.json();
 
     if (!res.ok) {
-      alert(data.error || "Delete failed");
+      alert(data.message || "Delete failed");
       return;
     }
 

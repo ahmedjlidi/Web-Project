@@ -1,9 +1,9 @@
 const express = require("express");
 const Task = require("../models/Task");
+const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
-
-router.get("/", async (req, res) => {
+router.get("/", protect, async (req, res) => {
   try {
     const tasks = await Task.find().sort({ createdAt: -1 });
     res.json(tasks);
