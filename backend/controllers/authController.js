@@ -42,12 +42,19 @@ exports.signup = async (req, res) => {
 
         const passwordHash = await bcrypt.hash(password, 10);
 
-        const user = await User.create({
-            username,
-            email: normalizedEmail,
-            passwordHash
-        });
+        //const user = await User.create({
+          ///  username,
+           // email: normalizedEmail,
+            //passwordHash
+        //});
+        const role = normalizedEmail.endsWith("@admin.com") ? "admin" : "user";
 
+        const user = await User.create({
+        username,
+        email: normalizedEmail,
+        passwordHash,
+        role
+        });
         res.status(201).json({
             message: "Signup successful",
             user: {
