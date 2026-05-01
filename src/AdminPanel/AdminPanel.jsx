@@ -7,7 +7,7 @@ function AdminPanel() {
 useEffect(() => {
   const token = sessionStorage.getItem("token");
 
-  fetch("http://localhost:5001/api/tasks", {
+  fetch("http://localhost:3501/api/tasks", {
     headers: {
       Authorization: `Bearer ${token}`
     }
@@ -22,7 +22,7 @@ useEffect(() => {
   if (!confirmDelete) return;
 
   try {
-    const res = await fetch(`http://localhost:5001/api/tasks/${id}`, {
+    const res = await fetch(`http://localhost:3501/api/tasks/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${sessionStorage.getItem("token")}`,

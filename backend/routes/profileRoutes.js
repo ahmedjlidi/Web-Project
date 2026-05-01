@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require("bcryptjs");
 const { protect } = require("../middleware/authMiddleware");
 const User = require("../models/User");
 
@@ -24,14 +25,15 @@ router.put("/me", protect, async (req, res) => {
       req.body.averageDailyStudyTime ?? user.averageDailyStudyTime;
     user.accuracy = req.body.accuracy ?? user.accuracy;
 
-    if (req.body.password) {
-      const bcrypt = require("bcryptjs");
-      user.passwordHash = await bcrypt.hash(req.body.password, 10);
+    if (req.body.newPassword) {
+      user.passwordHash = await bcrypt.hash(req.body.newPassword, 10);
     }
+
     const updatedUser = await user.save();
 
     res.json({
       _id: updatedUser._id,
+      id: updatedUser._id,
       username: updatedUser.username,
       email: updatedUser.email,
       avatar: updatedUser.avatar,
@@ -41,6 +43,7 @@ router.put("/me", protect, async (req, res) => {
       role: updatedUser.role,
     });
   } catch (error) {
+    console.log("PROFILE UPDATE ERROR:", error);
     res.status(500).json({ message: "Failed to update profile" });
   }
 });

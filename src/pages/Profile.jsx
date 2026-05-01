@@ -28,7 +28,7 @@ useEffect(() => {
 
   if (!token) return;
 
-  fetch("http://localhost:5001/api/profile/me", {
+  fetch("http://localhost:3501/api/profile/me", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -100,7 +100,7 @@ useEffect(() => {
     }
 
     try {
-      const res = await fetch("http://localhost:5001/api/profile/me", {
+      const res = await fetch("http://localhost:3501/api/profile/me", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

@@ -60,7 +60,7 @@ function AddTask({ setTasks, onClose }) {
   };
 
   try {
-    const res = await fetch("http://localhost:5001/api/tasks", {
+    const res = await fetch("http://localhost:3501/api/tasks", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

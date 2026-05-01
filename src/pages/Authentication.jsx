@@ -188,7 +188,7 @@ function Authentication({ state }) {
             let data
 
             if (isLogin) {
-                response = await fetch("http://localhost:5001/api/auth/login", {
+                response = await fetch("http://localhost:3501/api/auth/login", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -197,7 +197,7 @@ function Authentication({ state }) {
                     })
                 })
             } else {
-                response = await fetch("http://localhost:5001/api/auth/register", {
+                response = await fetch("http://localhost:3501/api/auth/register", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({

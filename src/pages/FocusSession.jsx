@@ -68,7 +68,7 @@ function FocusSession() {
 async function handleSubmitSurvey(sessionData) {
   try {
     const res = await fetch(
-      `http://localhost:5001/api/tasks/${taskID}/progress`,
+      `http://localhost:3501/api/tasks/${taskID}/progress`,
       {
         method: "PATCH",
         headers: {
@@ -88,6 +88,15 @@ async function handleSubmitSurvey(sessionData) {
       return;
     }
 
+    const user = JSON.parse(sessionStorage.getItem("user"));
+const studiedKey = `studiedToday_${user?.id}`;
+
+const oldStudiedToday =
+  Number(sessionStorage.getItem(studiedKey)) || 0;
+
+const newStudiedToday = oldStudiedToday + sessionData.duration;
+
+sessionStorage.setItem(studiedKey, String(newStudiedToday));
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
         task.taskID === taskID
@@ -102,12 +111,6 @@ async function handleSubmitSurvey(sessionData) {
     );
 
     navigate("/dashboard");
-    const oldStudiedToday =
-  Number(sessionStorage.getItem("studiedToday")) || 0;
-
-const newStudiedToday = oldStudiedToday + sessionData.duration;
-
-sessionStorage.setItem("studiedToday", newStudiedToday);
   } catch (err) {
     console.error(err);
     alert("Server error");

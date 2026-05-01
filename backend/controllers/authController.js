@@ -7,7 +7,9 @@ const generateToken = (user) => {
     return jwt.sign(
         {
             id: user._id,
-            username: user.username
+            username: user.username,
+             role: user.role
+
         },
         process.env.JWT_SECRET,
         {
@@ -26,8 +28,10 @@ exports.signup = async (req, res) => {
             });
         }
 
+        const normalizedEmail = email.toLowerCase();
+
         const existingUser = await User.findOne({
-            $or: [{ username }, { email }]
+            email: normalizedEmail
         });
 
         if (existingUser) {
@@ -40,7 +44,7 @@ exports.signup = async (req, res) => {
 
         const user = await User.create({
             username,
-            email,
+            email: normalizedEmail,
             passwordHash
         });
 
@@ -49,7 +53,9 @@ exports.signup = async (req, res) => {
             user: {
                 id: user._id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                role: user.role
+
             }
         });
     } catch (error) {
@@ -58,7 +64,6 @@ exports.signup = async (req, res) => {
         });
     }
 };
-
 exports.login = async (req, res) => {
     try {
         const { loginIdentifier, password } = req.body;
@@ -100,7 +105,9 @@ exports.login = async (req, res) => {
             user: {
                 id: user._id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                role: user.role
+
             }
         });
     } catch (error) {
