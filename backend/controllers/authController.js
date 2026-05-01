@@ -26,8 +26,10 @@ exports.signup = async (req, res) => {
             });
         }
 
+        const normalizedEmail = email.toLowerCase();
+
         const existingUser = await User.findOne({
-            $or: [{ username }, { email }]
+            email: normalizedEmail
         });
 
         if (existingUser) {
@@ -40,7 +42,7 @@ exports.signup = async (req, res) => {
 
         const user = await User.create({
             username,
-            email,
+            email: normalizedEmail,
             passwordHash
         });
 
@@ -58,7 +60,6 @@ exports.signup = async (req, res) => {
         });
     }
 };
-
 exports.login = async (req, res) => {
     try {
         const { loginIdentifier, password } = req.body;
