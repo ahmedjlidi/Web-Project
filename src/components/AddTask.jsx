@@ -28,7 +28,19 @@ function AddTask({ setTasks, onClose }) {
             currentProgress: 0
         };
 
+<<<<<<< Updated upstream
         setTasks((prevTasks) => [...prevTasks, newTask]);
+=======
+        try {
+            const res = await fetch("http://localhost:5001/api/tasks", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify(newTask)
+            });
+>>>>>>> Stashed changes
 
         setTitle("");
         setEstimatedDuration("");

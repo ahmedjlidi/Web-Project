@@ -25,9 +25,16 @@ function NotificationBanner() {
         sessionStorage.setItem("profile", JSON.stringify(profile));
 
         const requiredMinutes = Number(profile.averageDailyStudyTime || 2) * 60;
-        const studiedToday =
-          Number(sessionStorage.getItem("studiedToday")) || 0;
+        const user = JSON.parse(sessionStorage.getItem("user"));
 
+if (!user) return;
+
+const today = new Date().toISOString().split("T")[0];
+
+const studiedKey = `studiedToday:${user.id}:${today}`;
+
+const studiedToday =
+  Number(sessionStorage.getItem(studiedKey)) || 0;
         if (studiedToday < requiredMinutes) {
           setMessage(
             `You studied ${studiedToday} minutes today. Your goal is ${requiredMinutes} minutes. Keep going!`

@@ -2,15 +2,43 @@ import Task from "./Task";
 import "./TaskList.css";
 
 function TaskList({ tasks, completedTasks, setTasks }) {
-    function handleDone(taskID) {
-        setTasks((prevTasks) =>
-            prevTasks.map((task) =>
-                task.taskID === taskID
-                    ? { ...task, currentProgress: 100 }
-                    : task
-            )
-        );
+    async function handleDone(taskID) {
+  try {
+    const res = await fetch(`http://localhost:5001/api/tasks/${taskID}/progress`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({
+        progress: 100,
+      }),
+    });
+
+    const updatedTask = await res.json();
+
+    if (!res.ok) {
+      alert(updatedTask.message || "Failed to update task");
+      return;
     }
+
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.taskID === taskID
+          ? {
+              ...task,
+              currentProgress: updatedTask.currentProgress,
+              updatedAt: updatedTask.updatedAt,
+              completedAt: updatedTask.completedAt,
+            }
+          : task
+      )
+    );
+  } catch (err) {
+    console.error(err);
+    alert("Server error");
+  }
+}
 
     function handleInfo(taskID) {
         console.log("Show info for task:", taskID);

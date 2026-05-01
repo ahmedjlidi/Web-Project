@@ -102,12 +102,19 @@ async function handleSubmitSurvey(sessionData) {
     );
 
     navigate("/dashboard");
-    const oldStudiedToday =
-  Number(sessionStorage.getItem("studiedToday")) || 0;
+   const user = JSON.parse(sessionStorage.getItem("user"));
+const today = new Date().toISOString().split("T")[0];
+
+const studiedKey = `studiedToday:${user.id}:${today}`;
+
+const oldStudiedToday =
+  Number(sessionStorage.getItem(studiedKey)) || 0;
 
 const newStudiedToday = oldStudiedToday + sessionData.duration;
 
-sessionStorage.setItem("studiedToday", newStudiedToday);
+sessionStorage.setItem(studiedKey, newStudiedToday);
+
+navigate("/dashboard");
   } catch (err) {
     console.error(err);
     alert("Server error");

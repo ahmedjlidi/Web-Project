@@ -3,11 +3,10 @@ import "./AdminPanel.css";
 
 function AdminPanel() {
   const [tasks, setTasks] = useState([]);
-
 useEffect(() => {
   const token = sessionStorage.getItem("token");
 
-  fetch("http://localhost:5001/api/tasks", {
+  fetch("http://localhost:5001/api/tasks/admin/all", {
     headers: {
       Authorization: `Bearer ${token}`
     }
