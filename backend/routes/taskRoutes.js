@@ -7,7 +7,10 @@ const router = express.Router();
 router.get("/", protect, async (req, res) => {
   try {
     if (req.user.role === "admin") {
-      const tasks = await Task.find().sort({ createdAt: -1 });
+      const tasks = await Task.find()
+        .populate("userID", "username email")
+        .sort({ createdAt: -1 });
+
       return res.json(tasks);
     }
 
@@ -21,7 +24,6 @@ router.get("/", protect, async (req, res) => {
     res.status(500).json({ message: "Failed to get tasks" });
   }
 });
-
 router.get("/analytics/summary", protect, async (req, res) => {
   try {
     const tasks = await Task.find({ userID: req.user._id });
