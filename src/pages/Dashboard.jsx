@@ -10,61 +10,87 @@ function Dashboard() {
   const { tasks, setTasks } = useTasks();
   const [showAddTask, setShowAddTask] = useState(false);
 
+  function isOverdue(task) {
+    if (!task.deadline) return false;
+
+    const deadlineDate = new Date(task.deadline);
+    const now = new Date();
+
+    if (isNaN(deadlineDate.getTime())) return false;
+
+    return now > deadlineDate && task.currentProgress < 100;
+  }
+
   useEffect(() => {
-  const token = sessionStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
-  if (!token) return;
+    if (!token) return;
 
-  fetch("http://localhost:3501/api/tasks", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then(async (res) => {
-      const data = await res.json();
-
-      if (!res.ok) {
-        console.log("Tasks error:", data.message);
-        return [];
-      }
-
-      return data;
+    fetch("http://localhost:3501/api/tasks", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
-    .then((data) => {
-      const mappedTasks = data.map((task) => ({
-        taskID: task._id,
-        userID: task.userID,
-        title: task.title,
-        estimatedDuration: task.estimatedDuration,
-        deadline: task.deadline
-          ? new Date(task.deadline).toLocaleString()
-          : "",
-        difficulty: task.difficulty,
-        priority: Number(task.priority),
-        category: task.category,
-        notes: task.notes,
-        createdAt: task.createdAt,
-        updatedAt: task.updatedAt,
-        currentProgress: task.currentProgress || 0,
-      }));
+      .then(async (res) => {
+        const data = await res.json();
 
-      setTasks(mappedTasks);
-    })
-    .catch((err) => console.log("Error loading tasks:", err));
-}, [setTasks]);
+        if (!res.ok) {
+          console.log("Tasks error:", data.message);
+          return [];
+        }
 
-  const activeTasks = tasks.filter((task) => task.currentProgress < 100);
-  const completedTasks = tasks.filter((task) => task.currentProgress >= 100);
+        return data;
+      })
+      .then((data) => {
+        const mappedTasks = data.map((task) => ({
+          taskID: task._id,
+          userID: task.userID,
+          title: task.title,
+          estimatedDuration: task.estimatedDuration,
 
-  const pendingTasksCount = tasks.filter(
-    (task) => task.currentProgress === 0
-  ).length;
+          // Keep raw date. Do not format here.
+          deadline: task.deadline,
 
-  const activeTasksCount = activeTasks.length;
+          difficulty: Number(task.difficulty),
+          priority: Number(task.priority),
+          category: task.category,
+          notes: task.notes,
+          createdAt: task.createdAt,
+          updatedAt: task.updatedAt,
+          completedAt: task.completedAt,
+          currentProgress: task.currentProgress || 0,
+        }));
+
+        setTasks(mappedTasks);
+      })
+      .catch((err) => console.log("Error loading tasks:", err));
+  }, [setTasks]);
+
+  const pendingTasks = tasks.filter(
+    (task) => task.currentProgress === 0 && !isOverdue(task)
+  );
+
+  const activeTasks = tasks.filter(
+    (task) =>
+      task.currentProgress > 0 &&
+      task.currentProgress < 100 &&
+      !isOverdue(task)
+  );
+
+  const overdueTasks = tasks.filter((task) => isOverdue(task));
+
+  const completedTasks = tasks.filter(
+    (task) => task.currentProgress >= 100
+  );
+
+  const incompleteTasks = tasks.filter(
+    (task) => task.currentProgress < 100
+  );
 
   return (
     <>
       <NotificationBanner />
+
       <div className="dashboard-header">
         <div>
           <h1>Welcome back, student</h1>
@@ -91,12 +117,22 @@ function Dashboard() {
       <div className="stats-grid">
         <div className="stat-card">
           <p>Pending Tasks</p>
-          <h2>{pendingTasksCount}</h2>
+          <h2>{pendingTasks.length}</h2>
         </div>
 
         <div className="stat-card">
           <p>Active Tasks</p>
-          <h2>{activeTasksCount}</h2>
+          <h2>{activeTasks.length}</h2>
+        </div>
+
+        <div className="stat-card">
+          <p>Completed Tasks</p>
+          <h2>{completedTasks.length}</h2>
+        </div>
+
+        <div className="stat-card">
+          <p>Overdue Tasks</p>
+          <h2>{overdueTasks.length}</h2>
         </div>
       </div>
 
@@ -111,7 +147,7 @@ function Dashboard() {
         </div>
       ) : (
         <TaskList
-          tasks={activeTasks}
+          tasks={incompleteTasks}
           completedTasks={completedTasks}
           setTasks={setTasks}
         />

@@ -172,3 +172,12 @@
     font-size: 13px;
     color: #6b7280;
 }
+
+.info-disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.info-disabled img {
+    filter: grayscale(100%);
+}

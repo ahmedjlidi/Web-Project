@@ -3,6 +3,24 @@ import "./Task.css";
 import infoIcon from "../assets/info.png";
 import TaskDetail from "./TaskDetail";
 
+
+function formatDeadline(deadline) {
+    if (!deadline) return "No deadline";
+
+    const date = new Date(deadline);
+
+    if (isNaN(date.getTime())) {
+        return deadline;
+    }
+
+    return date.toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+    });
+}
+
 function Task({
     taskID,
     userID,
@@ -17,7 +35,8 @@ function Task({
     updatedAt,
     onDone,
     onInfo,
-    currentProgress
+    currentProgress,
+    disableInfo
 }) {
     const [showDetails, setShowDetails] = useState(false);
 
@@ -29,6 +48,8 @@ function Task({
     }
 
     function handleInfoClick() {
+        if (disableInfo) return;
+
         setShowDetails(true);
 
         if (onInfo) onInfo(taskID);
@@ -56,10 +77,8 @@ function Task({
 
     function getPriorityMeta(value) {
         if (value === 1) {
-
             return { label: "Low", className: "priority-low" };
         } else if (value === 2) {
-
             return { label: "Medium", className: "priority-medium" };
         } else {
             return { label: "High", className: "priority-high" };
@@ -81,8 +100,9 @@ function Task({
                     ></button>
 
                     <button
-                        className="info-button"
+                        className={`info-button ${disableInfo ? "info-disabled" : ""}`}
                         onClick={handleInfoClick}
+                        disabled={disableInfo}
                         aria-label="Show task details"
                     >
                         <img src={infoIcon} alt="Info" />
@@ -93,7 +113,7 @@ function Task({
 
                 <div className="task-subinfo">
                     <span>{estimatedDuration} min</span>
-                    <span>Due {deadline}</span>
+                    <span>Due {formatDeadline(deadline)}</span>
                 </div>
 
                 <div className="task-badges">
@@ -101,7 +121,7 @@ function Task({
                         {difficultyMeta.label}
                     </span>
 
-                    <span className={`task-pill priority-pill priority-high`}>
+                    <span className={`task-pill priority-pill ${priorityMeta.className}`}>
                         {priorityMeta.label}
                     </span>
                 </div>
@@ -120,7 +140,7 @@ function Task({
                 </div>
             </div>
 
-            {showDetails && (
+            {showDetails && !disableInfo && (
                 <TaskDetail
                     taskID={taskID}
                     title={title}
