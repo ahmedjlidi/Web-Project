@@ -50,10 +50,10 @@ exports.signup = async (req, res) => {
         const role = normalizedEmail.endsWith("@admin.com") ? "admin" : "user";
 
         const user = await User.create({
-        username,
-        email: normalizedEmail,
-        passwordHash,
-        role
+            username,
+            email: normalizedEmail,
+            passwordHash,
+            role
         });
         res.status(201).json({
             message: "Signup successful",
