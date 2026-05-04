@@ -30,12 +30,13 @@ function StudyPreferences({
       </div>
 
       <div className="form-group">
-        <label>Daily Study Time: {studyTime} hours</label>
+        <label>Daily Study Time: {studyTime} min (
+          {(studyTime / 60).toFixed(1)} hrs)</label>
         <input
           type="range"
-          min="1"
-          max="8"
-          step="1"
+          min="5"
+          max="180"
+          step="5"
           value={studyTime}
           onChange={(e) => setStudyTime(Number(e.target.value))}
           className="slider"
