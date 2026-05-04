@@ -28,12 +28,13 @@ useEffect(() => {
 
   if (!token) return;
 
+  // send get request including the authorization header so backend knows which user logged in
   fetch("http://localhost:3501/api/profile/me", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   })
-    .then((res) => res.json())
+    .then((res) => res.json())    // returns profile data
     .then((data) => {
       setName(data.username || "");
       setEmail(data.email || "");
@@ -78,13 +79,17 @@ useEffect(() => {
 
   const handleSave = async () => {
     if (newPassword || confirmPassword) {
+      // check if new password:
+      // has at least 8 characters
+      // has at least 1 capital letter
+      // has at least 1 number
       const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
       if (!PASSWORD_REGEX.test(newPassword)) {
         setPasswordError(
           "Password must be at least 8 characters, include a capital letter and a number"
         );
-        return;
+          return;
       }
 
       if (newPassword !== confirmPassword) {

@@ -10,6 +10,7 @@ import "./Dashboard.css";
 function Dashboard() {
   const { tasks, setTasks } = useTasks();
   const [showAddTask, setShowAddTask] = useState(false);
+  const [user, setUser] = useState(null);
 
   function isOverdue(task) {
     if (!task.deadline) return false;
@@ -23,7 +24,12 @@ function Dashboard() {
   }
 
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
+  const savedUser = sessionStorage.getItem("user");
+
+  if (savedUser) {
+    setUser(JSON.parse(savedUser));
+  }
 
     if (!token) return;
 
@@ -115,8 +121,11 @@ function Dashboard() {
 
       <div className="dashboard-header">
         <div>
-          <h1>Welcome back, student</h1>
+          <h1>Welcome back, {user?.username || "student"}</h1>
           <p>{getWelcomeMessage()}</p>
+          {/* <p>
+            Let&apos;s make today productive. You have {activeTasks.length} active tasks.
+          </p> */}
         </div>
 
         <Button

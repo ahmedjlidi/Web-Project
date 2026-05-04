@@ -20,13 +20,14 @@ router.put("/me", protect, async (req, res) => {
     user.username = req.body.username || user.username;
     user.avatar = req.body.avatar ?? user.avatar;
     user.preferredSessionLength =
-      req.body.preferredSessionLength ?? user.preferredSessionLength;
+    req.body.preferredSessionLength ?? user.preferredSessionLength;
     user.averageDailyStudyTime =
-      req.body.averageDailyStudyTime ?? user.averageDailyStudyTime;
+    req.body.averageDailyStudyTime ?? user.averageDailyStudyTime;
     user.accuracy = req.body.accuracy ?? user.accuracy;
 
-    if (req.body.newPassword) {
-      user.passwordHash = await bcrypt.hash(req.body.newPassword, 10);
+    // hash password using bcrypt and saves it in passwordHash
+    if (req.body.password) {
+      user.passwordHash = await bcrypt.hash(req.body.password, 10);
     }
 
     const updatedUser = await user.save();
