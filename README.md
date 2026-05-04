@@ -1,4 +1,14 @@
-## Instructions to Run StudyBuddy
+## Instructions to Run StuduBuddy
+
+### 0. Clone and Switch to "rahma-branch2"
+
+```bash
+git clone https://github.com/ahmedjlidi/Web-Project
+cd Web-Project
+git checkout rahma-branch2
+```
+
+---
 
 This project uses a **local MongoDB database**.
 The database files are included in the project folder under:
