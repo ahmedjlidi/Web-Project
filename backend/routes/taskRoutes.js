@@ -68,6 +68,8 @@ router.get("/:id", protect, async (req, res) => {
   }
 });
 
+
+
 router.post("/", protect, async (req, res) => {
   try {
     if (!req.body.title) {
@@ -77,15 +79,16 @@ router.post("/", protect, async (req, res) => {
     const task = await Task.create({
       ...req.body,
       userID: req.user._id,
+      currentProgress: 0
     });
 
-    res.status(201).json(task);
-  } catch (error) {
-    console.log("CREATE TASK ERROR:", error);
-    res.status(500).json({
-      message: "Failed to create task",
-      error: error.message,
+    res.status(201).json({
+      message: "Task created successfully",
+      task
     });
+  } catch (error) {
+    console.error("Create task error:", error);
+    res.status(500).json({ message: error.message || "Failed to create task" });
   }
 });
 

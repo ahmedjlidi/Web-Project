@@ -10,85 +10,90 @@ function AddTask({ setTasks, onClose }) {
     const [category, setCategory] = useState("");
     const [notes, setNotes] = useState("");
 
-   /* function handleSubmit(e) {
+    /* function handleSubmit(e) {
+         e.preventDefault();
+ 
+         const newTask = {
+             taskID: Date.now(),
+             userID: 1,
+             title: title,
+             estimatedDuration: Number(estimatedDuration),
+             deadline: deadline,
+             difficulty: Number(difficulty),
+             priority: Number(priority),
+             category: category,
+             notes: notes,
+             createdAt: new Date().toISOString(),
+             updatedAt: new Date().toISOString(),
+             currentProgress: 0
+         };
+ 
+         setTasks((prevTasks) => [...prevTasks, newTask]);
+ 
+         setTitle("");
+         setEstimatedDuration("");
+         setDifficulty(3);
+         setDeadline("");
+         setPriority(3);
+         setCategory("");
+ 
+         if (onClose) onClose();
+     }*/
+    async function handleSubmit(e) {
         e.preventDefault();
 
+        const token = sessionStorage.getItem("token");
+
+        if (!token) {
+            alert("You must login first");
+            return;
+        }
+
         const newTask = {
-            taskID: Date.now(),
-            userID: 1,
-            title: title,
+            title,
             estimatedDuration: Number(estimatedDuration),
-            deadline: deadline,
+            deadline,
             difficulty: Number(difficulty),
             priority: Number(priority),
-            category: category,
-            notes: notes,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            currentProgress: 0
+            category,
+            notes
         };
 
-        setTasks((prevTasks) => [...prevTasks, newTask]);
+        try {
+            const res = await fetch("http://localhost:3501/api/tasks", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify(newTask)
+            });
 
-        setTitle("");
-        setEstimatedDuration("");
-        setDifficulty(3);
-        setDeadline("");
-        setPriority(3);
-        setCategory("");
+            const data = await res.json();
 
-        if (onClose) onClose();
-    }*/
-   async function handleSubmit(e) {
-  e.preventDefault();
+            if (!res.ok) {
+                alert(data.message || "Failed to create task");
+                return;
+            }
 
-  const token = sessionStorage.getItem("token");
+            const createdTask = data.task;
 
-  if (!token) {
-    alert("You must login first");
-    return;
-  }
+            setTasks((prev) => [
+                ...prev,
+                {
+                    ...createdTask,
+                    taskID: createdTask._id,
+                    currentProgress: createdTask.currentProgress || 0
+                }
+            ]);
 
-  const newTask = {
-    title,
-    estimatedDuration: Number(estimatedDuration),
-    deadline,
-    difficulty: Number(difficulty),
-    priority: Number(priority),
-    category,
-    notes
-  };
+            onClose();
 
-  try {
-    const res = await fetch("http://localhost:3501/api/tasks", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(newTask)
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.error || "Failed to create task");
-      return;
+        } catch (err) {
+            console.error(err);
+            alert("Server error");
+        }
     }
-
-    setTasks((prev) => [...prev, {
-      ...data,
-      taskID: data._id,
-      currentProgress: data.currentProgress || 0
-    }]);
-
-    onClose();
-
-  } catch (err) {
-    console.error(err);
-    alert("Server error");
-  }
-}
 
     return (
         <div className="add-task-overlay">
