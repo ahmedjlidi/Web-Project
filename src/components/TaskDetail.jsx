@@ -1,6 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import "./TaskDetail.css";
 
+function formatDateTime(iso) {
+    return new Date(iso).toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
 function TaskDetail({
     taskID,
     title,
@@ -48,7 +58,7 @@ function TaskDetail({
 
                         <div>
                             <span className="detail-label">Deadline</span>
-                            <p>{deadline}</p>
+                            <p>{formatDateTime(deadline)}</p>
                         </div>
 
                         <div>
@@ -94,17 +104,17 @@ function TaskDetail({
                 </div>
 
                 <div className="task-detail-section">
-                    <h3>Metadata</h3>
+                    <h3>More info</h3>
 
                     <div className="task-detail-grid">
                         <div>
                             <span className="detail-label">Created At</span>
-                            <p>{createdAt}</p>
+                            <p>{formatDateTime(createdAt)}</p>
                         </div>
 
                         <div>
                             <span className="detail-label">Updated At</span>
-                            <p>{updatedAt}</p>
+                            <p>{formatDateTime(updatedAt)}</p>
                         </div>
                     </div>
                 </div>

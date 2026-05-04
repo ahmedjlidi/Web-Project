@@ -24,12 +24,12 @@ function Dashboard() {
   }
 
   useEffect(() => {
-  const token = sessionStorage.getItem("token");
-  const savedUser = sessionStorage.getItem("user");
+    const token = sessionStorage.getItem("token");
+    const savedUser = sessionStorage.getItem("user");
 
-  if (savedUser) {
-    setUser(JSON.parse(savedUser));
-  }
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
 
     if (!token) return;
 
@@ -178,15 +178,22 @@ function Dashboard() {
       </div>
 
       <div className="section-header">
-        <h2>Pending Tasks</h2>
+        <h2></h2>
       </div>
 
       {tasks.length === 0 ? (
         <div className="empty-box">
+          <div className="empty-icon">□</div>
+          <h3>You have no tasks yet</h3>
+          <p>Create your first task to start organizing your study work.</p>
+          <button onClick={() => setShowAddTask(true)}>Add a Task</button>
+        </div>
+      ) : incompleteTasks.length === 0 ? (
+        <div className="empty-box">
           <div className="empty-icon">✓</div>
           <h3>All caught up!</h3>
-          <p>You have no urgent tasks. Add something new to your plate.</p>
-          <button onClick={() => setShowAddTask(true)}>Add a Task</button>
+          <p>All your current tasks are completed. Add a new task when you are ready.</p>
+          <button onClick={() => setShowAddTask(true)}>Add another task</button>
         </div>
       ) : (
         <TaskList

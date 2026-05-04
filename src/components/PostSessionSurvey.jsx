@@ -1,6 +1,16 @@
 import { useState } from "react";
 import "./PostSessionSurvey.css";
 
+function formatDateTime(iso) {
+    return new Date(iso).toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
 function PostSessionSurvey({
     taskID,
     userID,
@@ -159,10 +169,10 @@ function PostSessionSurvey({
 
                 <div className="survey-summary">
                     <p>
-                        <strong>Started:</strong> {startTime}
+                        <strong>Started:</strong> {formatDateTime(startTime)}
                     </p>
                     <p>
-                        <strong>Ended:</strong> {endTime}
+                        <strong>Ended:</strong> {formatDateTime(endTime)}
                     </p>
                     <p>
                         <strong>Duration:</strong> {duration} min
