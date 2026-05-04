@@ -1,5 +1,6 @@
 const express = require("express");
 const Task = require("../models/Task");
+const User = require("../models/User");
 const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
@@ -7,7 +8,19 @@ const router = express.Router();
 router.get("/", protect, async (req, res) => {
   try {
     if (req.user.role === "admin") {
-      const tasks = await Task.find()
+      const username = req.query.username;
+
+      let query = {};
+
+      if (username && username.trim() !== "") {
+        const users = await User.find({
+          username: { $regex: username.trim(), $options: "i" },
+        }).select("_id");
+
+        query.userID = { $in: users.map((user) => user._id) };
+      }
+
+      const tasks = await Task.find(query)
         .populate("userID", "username email")
         .sort({ createdAt: -1 });
 
@@ -24,6 +37,7 @@ router.get("/", protect, async (req, res) => {
     res.status(500).json({ message: "Failed to get tasks" });
   }
 });
+
 router.get("/analytics/summary", protect, async (req, res) => {
   try {
     const tasks = await Task.find({ userID: req.user._id });
@@ -49,13 +63,32 @@ router.get("/analytics/summary", protect, async (req, res) => {
     res.status(500).json({ message: "Failed to get analytics" });
   }
 });
+router.get("/admin/summary", protect, async (req, res) => {
+  try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Access denied" });
+    }
 
+    const totalUsers = await User.countDocuments();
+    const totalTasks = await Task.countDocuments();
+
+    res.json({
+      totalUsers,
+      totalTasks,
+    });
+  } catch (error) {
+    console.log("ADMIN SUMMARY ERROR:", error);
+    res.status(500).json({ message: "Failed to get admin summary" });
+  }
+});
 router.get("/:id", protect, async (req, res) => {
   try {
-    const task = await Task.findOne({
-      _id: req.params.id,
-      userID: req.user._id,
-    });
+    const query =
+      req.user.role === "admin"
+        ? { _id: req.params.id }
+        : { _id: req.params.id, userID: req.user._id };
+
+    const task = await Task.findOne(query).populate("userID", "username email");
 
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
@@ -69,7 +102,6 @@ router.get("/:id", protect, async (req, res) => {
 });
 
 
-
 router.post("/", protect, async (req, res) => {
   try {
     if (!req.body.title) {
@@ -79,12 +111,12 @@ router.post("/", protect, async (req, res) => {
     const task = await Task.create({
       ...req.body,
       userID: req.user._id,
-      currentProgress: 0
+      currentProgress: 0,
     });
 
     res.status(201).json({
       message: "Task created successfully",
-      task
+      task,
     });
   } catch (error) {
     console.error("Create task error:", error);
@@ -94,14 +126,12 @@ router.post("/", protect, async (req, res) => {
 
 router.put("/:id", protect, async (req, res) => {
   try {
-    const task = await Task.findOneAndUpdate(
-      {
-        _id: req.params.id,
-        userID: req.user._id,
-      },
-      req.body,
-      { new: true }
-    );
+    const query =
+      req.user.role === "admin"
+        ? { _id: req.params.id }
+        : { _id: req.params.id, userID: req.user._id };
+
+    const task = await Task.findOneAndUpdate(query, req.body, { new: true });
 
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
@@ -118,6 +148,10 @@ router.patch("/:id/progress", protect, async (req, res) => {
   try {
     const progress = Number(req.body.progress);
 
+    if (Number.isNaN(progress) || progress < 0 || progress > 100) {
+      return res.status(400).json({ message: "Progress must be between 0 and 100" });
+    }
+
     const updateData = {
       currentProgress: progress,
     };
@@ -126,14 +160,12 @@ router.patch("/:id/progress", protect, async (req, res) => {
       updateData.completedAt = new Date();
     }
 
-    const task = await Task.findOneAndUpdate(
-      {
-        _id: req.params.id,
-        userID: req.user._id,
-      },
-      updateData,
-      { new: true }
-    );
+    const query =
+      req.user.role === "admin"
+        ? { _id: req.params.id }
+        : { _id: req.params.id, userID: req.user._id };
+
+    const task = await Task.findOneAndUpdate(query, updateData, { new: true });
 
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
