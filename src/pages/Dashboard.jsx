@@ -4,6 +4,7 @@ import TaskList from "../components/TaskList";
 import AddTask from "../components/AddTask";
 import { useTasks } from "../components/TaskContext";
 import NotificationBanner from "../components/NotificationBanner";
+import logo from "../assets/logo.svg";
 import "./Dashboard.css";
 
 function Dashboard() {
@@ -47,10 +48,7 @@ function Dashboard() {
           userID: task.userID,
           title: task.title,
           estimatedDuration: task.estimatedDuration,
-
-          // Keep raw date. Do not format here.
           deadline: task.deadline,
-
           difficulty: Number(task.difficulty),
           priority: Number(task.priority),
           category: task.category,
@@ -87,16 +85,38 @@ function Dashboard() {
     (task) => task.currentProgress < 100
   );
 
+  function getWelcomeMessage() {
+    if (tasks.length === 0) {
+      return "You have no tasks! Add something and start working.";
+    }
+
+    if (completedTasks.length === tasks.length) {
+      return "Good job. All your tasks are completed.";
+    }
+
+    if (overdueTasks.length > 0) {
+      return `You have ${overdueTasks.length} overdue task${overdueTasks.length > 1 ? "s" : ""}.`;
+    }
+
+    if (activeTasks.length > 0) {
+      return `You have ${activeTasks.length} active task${activeTasks.length > 1 ? "s" : ""}.`;
+    }
+
+    if (pendingTasks.length > 0) {
+      return `You have ${pendingTasks.length} pending task${pendingTasks.length > 1 ? "s" : ""}.`;
+    }
+
+    return "Check your task list and plan your next step.";
+  }
+
   return (
-    <>
+    <main className="dashboard-main">
       <NotificationBanner />
 
       <div className="dashboard-header">
         <div>
           <h1>Welcome back, student</h1>
-          <p>
-            Let&apos;s make today productive. You have {activeTasks.length} active tasks.
-          </p>
+          <p>{getWelcomeMessage()}</p>
         </div>
 
         <Button
@@ -105,45 +125,59 @@ function Dashboard() {
         >
           + New Task
         </Button>
-
-        {showAddTask && (
-          <AddTask
-            setTasks={setTasks}
-            onClose={() => setShowAddTask(false)}
-          />
-        )}
       </div>
+
+      {showAddTask && (
+        <AddTask
+          setTasks={setTasks}
+          onClose={() => setShowAddTask(false)}
+        />
+      )}
 
       <div className="stats-grid">
         <div className="stat-card">
-          <p>Pending Tasks</p>
-          <h2>{pendingTasks.length}</h2>
+          <div className="stat-icon blue">○</div>
+          <div>
+            <p>Pending Tasks</p>
+            <h2>{pendingTasks.length}</h2>
+          </div>
         </div>
 
         <div className="stat-card">
-          <p>Active Tasks</p>
-          <h2>{activeTasks.length}</h2>
+          <div className="stat-icon green">↗</div>
+          <div>
+            <p>Active Tasks</p>
+            <h2>{activeTasks.length}</h2>
+          </div>
         </div>
 
         <div className="stat-card">
-          <p>Completed Tasks</p>
-          <h2>{completedTasks.length}</h2>
+          <div className="stat-icon purple">✓</div>
+          <div>
+            <p>Completed Tasks</p>
+            <h2>{completedTasks.length}</h2>
+          </div>
         </div>
 
         <div className="stat-card">
-          <p>Overdue Tasks</p>
-          <h2>{overdueTasks.length}</h2>
+          <div className="stat-icon red">!</div>
+          <div>
+            <p>Overdue Tasks</p>
+            <h2>{overdueTasks.length}</h2>
+          </div>
         </div>
       </div>
 
       <div className="section-header">
-        <h2>Priority Action Items</h2>
+        <h2>Pending Tasks</h2>
       </div>
 
       {tasks.length === 0 ? (
         <div className="empty-box">
+          <div className="empty-icon">✓</div>
           <h3>All caught up!</h3>
-          <p>You have no tasks yet.</p>
+          <p>You have no urgent tasks. Add something new to your plate.</p>
+          <button onClick={() => setShowAddTask(true)}>Add a Task</button>
         </div>
       ) : (
         <TaskList
@@ -152,7 +186,7 @@ function Dashboard() {
           setTasks={setTasks}
         />
       )}
-    </>
+    </main>
   );
 }
 
