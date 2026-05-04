@@ -178,7 +178,7 @@ function Dashboard() {
       </div>
 
       <div className="section-header">
-        <h2>Priority Action Items</h2>
+        <h2></h2>
       </div>
 
       {tasks.length === 0 ? (
