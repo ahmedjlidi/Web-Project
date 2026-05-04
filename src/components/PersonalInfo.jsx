@@ -224,20 +224,6 @@ function PersonalInfo({
             {passwordError && <p className="error">{passwordError}</p>}
           </div>
 
-          <div className="form-group">
-            <label>Confirm Password</label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => {
-                setConfirmPassword(e.target.value);
-                setPasswordError("");
-              }}
-            />
-          </div>
-
-          {passwordError && <p className="error">{passwordError}</p>}
-
         </div>
       </div>
     </div>
