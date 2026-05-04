@@ -11,7 +11,7 @@ function NotificationBanner() {
 
         if (!token) return;
 
-        const res = await fetch("http://localhost:5001/api/profile/me", {
+        const res = await fetch("http://localhost:3501/api/profile/me", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -25,9 +25,9 @@ function NotificationBanner() {
         sessionStorage.setItem("profile", JSON.stringify(profile));
 
         const requiredMinutes = Number(profile.averageDailyStudyTime || 2) * 60;
-        const studiedToday =
-          Number(sessionStorage.getItem("studiedToday")) || 0;
-
+        const user = JSON.parse(sessionStorage.getItem("user"));
+const studiedKey = `studiedToday_${user?.id}`;
+const studiedToday = Number(sessionStorage.getItem(studiedKey)) || 0;
         if (studiedToday < requiredMinutes) {
           setMessage(
             `You studied ${studiedToday} minutes today. Your goal is ${requiredMinutes} minutes. Keep going!`

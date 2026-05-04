@@ -7,7 +7,7 @@ function AdminPanel() {
 useEffect(() => {
   const token = sessionStorage.getItem("token");
 
-  fetch("http://localhost:5001/api/tasks", {
+  fetch("http://localhost:3501/api/tasks", {
     headers: {
       Authorization: `Bearer ${token}`
     }
@@ -22,7 +22,7 @@ useEffect(() => {
   if (!confirmDelete) return;
 
   try {
-    const res = await fetch(`http://localhost:5001/api/tasks/${id}`, {
+    const res = await fetch(`http://localhost:3501/api/tasks/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${sessionStorage.getItem("token")}`,
@@ -53,20 +53,31 @@ useEffect(() => {
         <p>No tasks found.</p>
       ) : (
         tasks.map((task) => (
-          <div key={task._id} className="admin-task-card">
-            <h3 className="admin-task-title">{task.title}</h3>
+  <div key={task._id} className="admin-task-card">
+    <h3 className="admin-task-title">{task.title}</h3>
 
-            <p className="admin-task-info">Priority: {task.priority}</p>
-            <p className="admin-task-info">Category: {task.category}</p>
+    <p className="admin-task-info">
+      User: {task.userID?.username || "Unknown user"}
+    </p>
 
-            <button
-              className="admin-delete-btn"
-              onClick={() => handleDelete(task._id)}
-            >
-              Delete
-            </button>
-          </div>
-        ))
+    <p className="admin-task-info">
+      Email: {task.userID?.email || "No email"}
+    </p>
+
+    <p className="admin-task-info">Priority: {task.priority}</p>
+    <p className="admin-task-info">Category: {task.category}</p>
+    <p className="admin-task-info">
+      Progress: {task.currentProgress || 0}%
+    </p>
+
+    <button
+      className="admin-delete-btn"
+      onClick={() => handleDelete(task._id)}
+    >
+      Delete
+    </button>
+  </div>
+))
       )}
     </div>
   );

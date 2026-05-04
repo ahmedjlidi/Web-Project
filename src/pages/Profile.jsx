@@ -22,18 +22,18 @@ function Profile({ setUser }) {
 
   const [avatar, setAvatar] = useState("");
 
-  // react asks backend for profile data and puts it in the input field
   useEffect(() => {
     const token = sessionStorage.getItem("token");
 
     if (!token) return;
 
-    fetch("http://localhost:5001/api/profile/me", {
+    // send get request including the authorization header so backend knows which user logged in
+    fetch("http://localhost:3501/api/profile/me", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
-      .then((res) => res.json())
+      .then((res) => res.json())    // returns profile data
       .then((data) => {
         setName(data.username || "");
         setEmail(data.email || "");
@@ -43,7 +43,7 @@ function Profile({ setUser }) {
         setAvatar(data.avatar || "");
       })
       .catch((err) => console.error("Connection failed:", err));
-  }, []);
+}, []);
 
   /*
   const handleSave = async () => {
@@ -78,13 +78,17 @@ function Profile({ setUser }) {
 
   const handleSave = async () => {
     if (newPassword || confirmPassword) {
+      // check if new password:
+      // has at least 8 characters
+      // has at least 1 capital letter
+      // has at least 1 number
       const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
       if (!PASSWORD_REGEX.test(newPassword)) {
         setPasswordError(
           "Password must be at least 8 characters, include a capital letter and a number"
         );
-        return;
+          return;
       }
 
       if (newPassword !== confirmPassword) {
@@ -101,8 +105,7 @@ function Profile({ setUser }) {
     }
 
     try {
-      const res = await fetch("http://localhost:5001/api/profile/me", {
-
+      const res = await fetch("http://localhost:3501/api/profile/me", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -119,12 +122,10 @@ function Profile({ setUser }) {
       }
 
       setUser(result);
-      //alert("Profile saved!");
 
       setNewPassword("");
       setConfirmPassword("");
       setPasswordError("");
-
     } catch {
       alert("Backend not running!");
     }

@@ -6,6 +6,14 @@ const router = express.Router();
 
 router.get("/", protect, async (req, res) => {
   try {
+    if (req.user.role === "admin") {
+      const tasks = await Task.find()
+        .populate("userID", "username email")
+        .sort({ createdAt: -1 });
+
+      return res.json(tasks);
+    }
+
     const tasks = await Task.find({ userID: req.user._id }).sort({
       createdAt: -1,
     });
@@ -16,7 +24,6 @@ router.get("/", protect, async (req, res) => {
     res.status(500).json({ message: "Failed to get tasks" });
   }
 });
-
 router.get("/analytics/summary", protect, async (req, res) => {
   try {
     const tasks = await Task.find({ userID: req.user._id });
@@ -141,10 +148,12 @@ router.patch("/:id/progress", protect, async (req, res) => {
 
 router.delete("/:id", protect, async (req, res) => {
   try {
-    const task = await Task.findOneAndDelete({
-      _id: req.params.id,
-      userID: req.user._id,
-    });
+    const query =
+      req.user.role === "admin"
+        ? { _id: req.params.id }
+        : { _id: req.params.id, userID: req.user._id };
+
+    const task = await Task.findOneAndDelete(query);
 
     if (!task) {
       return res.status(404).json({ message: "Task not found" });

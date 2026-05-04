@@ -1,16 +1,55 @@
-# React + Vite
+## Instructions to Run StuduBuddy
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+### 0. Clone and Switch to "rahma-branch2"
 
-Currently, two official plugins are available:
+```bash
+git clone https://github.com/ahmedjlidi/Web-Project
+cd Web-Project
+git checkout rahma-branch2
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+This project uses a **local MongoDB database**.
+The database files are included in the project folder under:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+`/db`
 
-## Expanding the ESLint configuration
+### 1. Install MongoDB
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+sudo apt install -y mongodb-org
+```
+
+### 2. Start MongoDB
+
+From the project root folder, run:
+
+```bash
+mongod --dbpath ./db --port 27017
+```
+
+Keep this terminal open.
+
+### 3. Run the Backend
+
+Open a new terminal:
+
+```bash
+cd backend
+node server.js
+```
+
+### 4. Run the Frontend
+
+Open another terminal from the project root:
+
+```bash
+npm run dev
+```
+
+### 5. Open the App
+
+```
+http://localhost:5173
+```

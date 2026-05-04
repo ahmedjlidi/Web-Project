@@ -20,7 +20,7 @@ function Layout() {
   const token = sessionStorage.getItem("token");
   if (!token) return;
 
-  fetch("http://localhost:5001/api/profile/me", {
+  fetch("http://localhost:3501/api/profile/me", {
     headers: {
       Authorization: `Bearer ${token}`,
     },

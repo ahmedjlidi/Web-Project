@@ -1,5 +1,6 @@
 import { Nav } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import logo from "./assets/logo.svg";
 import "./Navigation.css";
 
 function Navigation({ user }) {
@@ -17,16 +18,24 @@ function Navigation({ user }) {
   return (
     <div className="sidebar">
       <div>
-        <h2 className="sidebar-logo">StudyBuddy</h2>
+        <div className="sidebar-brand">
+          <img src={logo} alt="StudyBuddy logo" />
+          <span>StudyBuddy</span>
+        </div>
 
         <Nav className="flex-column sidebar-nav">
           <Nav.Link
             as={Link}
             to="/dashboard"
-            className={location.pathname === "/dashboard" ? "sidebar-link active-link" : "sidebar-link"}
+            className={
+              location.pathname === "/dashboard"
+                ? "sidebar-link active-link"
+                : "sidebar-link"
+            }
           >
             Dashboard
           </Nav.Link>
+
           {/*
           <Nav.Link
             as={Link}
@@ -36,10 +45,15 @@ function Navigation({ user }) {
             Tasks
           </Nav.Link>
           */}
+
           <Nav.Link
             as={Link}
             to="/analytics"
-            className={location.pathname === "/analytics" ? "sidebar-link active-link" : "sidebar-link"}
+            className={
+              location.pathname === "/analytics"
+                ? "sidebar-link active-link"
+                : "sidebar-link"
+            }
           >
             Analytics
           </Nav.Link>
@@ -47,7 +61,11 @@ function Navigation({ user }) {
           <Nav.Link
             as={Link}
             to="/profile"
-            className={location.pathname === "/profile" ? "sidebar-link active-link" : "sidebar-link"}
+            className={
+              location.pathname === "/profile"
+                ? "sidebar-link active-link"
+                : "sidebar-link"
+            }
           >
             Profile
           </Nav.Link>
@@ -56,7 +74,11 @@ function Navigation({ user }) {
             <Nav.Link
               as={Link}
               to="/admin"
-              className={location.pathname === "/admin" ? "sidebar-link active-link" : "sidebar-link"}
+              className={
+                location.pathname === "/admin"
+                  ? "sidebar-link active-link"
+                  : "sidebar-link"
+              }
             >
               Admin
             </Nav.Link>
@@ -64,21 +86,21 @@ function Navigation({ user }) {
         </Nav>
       </div>
 
-        <div className="sidebar-bottom">
-          <div className="user-box">
-            <div className="user-avatar">
-              {user?.avatar ? (
-                <img src={user.avatar} className="avatar-img" />
-              ) : (
-                user?.username?.charAt(0).toUpperCase()
-              )}
-            </div>
-
-            <div className="user-info"> 
-              <p className="user-name">{user?.username}</p>
-              <p className="user-email">{user?.email}</p>
-            </div>
+      <div className="sidebar-bottom">
+        <div className="user-box">
+          <div className="user-avatar">
+            {user?.avatar ? (
+              <img src={user.avatar} className="avatar-img" alt="User avatar" />
+            ) : (
+              user?.username?.charAt(0).toUpperCase()
+            )}
           </div>
+
+          <div className="user-info">
+            <p className="user-name">{user?.username}</p>
+            <p className="user-email">{user?.email}</p>
+          </div>
+        </div>
 
         <button className="signout-btn" onClick={handleSignOut}>
           Sign Out
