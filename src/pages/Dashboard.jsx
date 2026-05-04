@@ -23,51 +23,101 @@ function Dashboard() {
     return now > deadlineDate && task.currentProgress < 100;
   }
 
+  // useEffect(() => {
+  //   const token = sessionStorage.getItem("token");
+  //   const savedUser = sessionStorage.getItem("user");
+
+  //   if (savedUser) {
+  //     setUser(JSON.parse(savedUser));
+  //   }
+
+  //   if (!token) return;
+
+  //   fetch("http://localhost:3501/api/tasks", {
+  //     headers: {
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //   })
+  //     .then(async (res) => {
+  //       const data = await res.json();
+
+  //       if (!res.ok) {
+  //         console.log("Tasks error:", data.message);
+  //         return [];
+  //       }
+
+  //       return data;
+  //     })
+  //     .then((data) => {
+  //       const mappedTasks = data.map((task) => ({
+  //         taskID: task._id,
+  //         userID: task.userID,
+  //         title: task.title,
+  //         estimatedDuration: task.estimatedDuration,
+  //         deadline: task.deadline,
+  //         difficulty: Number(task.difficulty),
+  //         priority: Number(task.priority),
+  //         category: task.category,
+  //         notes: task.notes,
+  //         createdAt: task.createdAt,
+  //         updatedAt: task.updatedAt,
+  //         completedAt: task.completedAt,
+  //         currentProgress: task.currentProgress || 0,
+  //       }));
+
+  //       setTasks(mappedTasks);
+  //     })
+  //     .catch((err) => console.log("Error loading tasks:", err));
+  // }, [setTasks]);
+
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
-    const savedUser = sessionStorage.getItem("user");
+    const fetchTasks = () => {
+      const token = sessionStorage.getItem("token");
 
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
+      if (!token) return;
 
-    if (!token) return;
-
-    fetch("http://localhost:3501/api/tasks", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(async (res) => {
-        const data = await res.json();
-
-        if (!res.ok) {
-          console.log("Tasks error:", data.message);
-          return [];
-        }
-
-        return data;
+      fetch("http://localhost:3501/api/tasks", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       })
-      .then((data) => {
-        const mappedTasks = data.map((task) => ({
-          taskID: task._id,
-          userID: task.userID,
-          title: task.title,
-          estimatedDuration: task.estimatedDuration,
-          deadline: task.deadline,
-          difficulty: Number(task.difficulty),
-          priority: Number(task.priority),
-          category: task.category,
-          notes: task.notes,
-          createdAt: task.createdAt,
-          updatedAt: task.updatedAt,
-          completedAt: task.completedAt,
-          currentProgress: task.currentProgress || 0,
-        }));
+        .then(async (res) => {
+          const data = await res.json();
 
-        setTasks(mappedTasks);
-      })
-      .catch((err) => console.log("Error loading tasks:", err));
+          if (!res.ok) {
+            console.log("Tasks error:", data.message);
+            return [];
+          }
+
+          return data;
+        })
+        .then((data) => {
+          const mappedTasks = data.map((task) => ({
+            taskID: task._id,
+            userID: task.userID,
+            title: task.title,
+            estimatedDuration: task.estimatedDuration,
+            deadline: task.deadline,
+            difficulty: Number(task.difficulty),
+            priority: Number(task.priority),
+            category: task.category,
+            notes: task.notes,
+            createdAt: task.createdAt,
+            updatedAt: task.updatedAt,
+            completedAt: task.completedAt,
+            currentProgress: task.currentProgress || 0,
+          }));
+
+          setTasks(mappedTasks);
+        })
+        .catch((err) => console.log("Error loading tasks:", err));
+    };
+
+    fetchTasks(); // first load
+
+    const interval = setInterval(fetchTasks, 3000); // 🔥 ADD THIS
+
+    return () => clearInterval(interval); // 🔥 ADD THIS
   }, [setTasks]);
 
   const pendingTasks = tasks.filter(
@@ -82,6 +132,12 @@ function Dashboard() {
   );
 
   const overdueTasks = tasks.filter((task) => isOverdue(task));
+  
+  const notificationMessage =
+  overdueTasks.length > 0
+    ? `⚠️ You have ${overdueTasks.length} overdue task${overdueTasks.length > 1 ? "s" : ""}.`
+    : ""; 
+  
 
   const completedTasks = tasks.filter(
     (task) => task.currentProgress >= 100
@@ -117,7 +173,7 @@ function Dashboard() {
 
   return (
     <main className="dashboard-main">
-      <NotificationBanner />
+      <NotificationBanner externalMessage={notificationMessage} />
 
       <div className="dashboard-header">
         <div>

@@ -18,31 +18,34 @@ function Profile({ setUser }) {
   const [studyTime, setStudyTime] = useState(2);
   const [accuracy, setAccuracy] = useState(2);
 
+  const [successMessage, setSuccessMessage] = useState("");
+
   //const [emailError, setEmailError] = useState("");
 
   const [avatar, setAvatar] = useState("");
 
-  useEffect(() => {
-    const token = sessionStorage.getItem("token");
+  // react asks backend for profile data and puts it in the input field
+useEffect(() => {
+  const token = sessionStorage.getItem("token");
 
-    if (!token) return;
+  if (!token) return;
 
-    // send get request including the authorization header so backend knows which user logged in
-    fetch("http://localhost:3501/api/profile/me", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  // send get request including the authorization header so backend knows which user logged in
+  fetch("http://localhost:3501/api/profile/me", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())    // returns profile data
+    .then((data) => {
+      setName(data.username || "");
+      setEmail(data.email || "");
+      setSessionLength(data.preferredSessionLength || 30);
+      setStudyTime(data.averageDailyStudyTime || 2);
+      setAccuracy(data.accuracy || 0);
+      setAvatar(data.avatar || "");
     })
-      .then((res) => res.json())    // returns profile data
-      .then((data) => {
-        setName(data.username || "");
-        setEmail(data.email || "");
-        setSessionLength(data.preferredSessionLength || 30);
-        setStudyTime(data.averageDailyStudyTime || 2);
-        setAccuracy(data.accuracy || 0);
-        setAvatar(data.avatar || "");
-      })
-      .catch((err) => console.error("Connection failed:", err));
+    .catch((err) => console.error("Connection failed:", err));
 }, []);
 
   /*
@@ -97,22 +100,23 @@ function Profile({ setUser }) {
       }
     }
 
-
+    // object is sent to backend
     const data = { username: name, email, preferredSessionLength: sessionLength, averageDailyStudyTime: studyTime, accuracy, avatar };
 
+    // sends new password to backend
     if (newPassword) {
       data.password = newPassword;
     }
-
+    // object is sent to backend
     try {
       const res = await fetch("http://localhost:3501/api/profile/me", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(data),
-      });
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      },
+      body: JSON.stringify(data),
+    });
 
       const result = await res.json();
 
@@ -122,10 +126,15 @@ function Profile({ setUser }) {
       }
 
       setUser(result);
+      //alert("Profile saved!");
 
       setNewPassword("");
       setConfirmPassword("");
       setPasswordError("");
+
+      setSuccessMessage("Password updated successfully!");
+      setTimeout(() => setSuccessMessage(""), 6000);
+
     } catch {
       alert("Backend not running!");
     }
@@ -194,6 +203,12 @@ function Profile({ setUser }) {
   return (
     <div className="profile-container">
       <h2 className="title">Profile Settings</h2>
+
+      {successMessage && (
+        <div className="success-banner">
+          {successMessage}
+        </div>
+      )}
 
       <div className="profile-card">
         <PersonalInfo
