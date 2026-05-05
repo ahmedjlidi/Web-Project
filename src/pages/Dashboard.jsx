@@ -132,12 +132,12 @@ function Dashboard() {
   );
 
   const overdueTasks = tasks.filter((task) => isOverdue(task));
-  
+
   const notificationMessage =
-  overdueTasks.length > 0
-    ? `⚠️ You have ${overdueTasks.length} overdue task${overdueTasks.length > 1 ? "s" : ""}.`
-    : ""; 
-  
+    overdueTasks.length > 0
+      ? `⚠️ You have ${overdueTasks.length} overdue task${overdueTasks.length > 1 ? "s" : ""}.`
+      : "";
+
 
   const completedTasks = tasks.filter(
     (task) => task.currentProgress >= 100
@@ -245,12 +245,20 @@ function Dashboard() {
           <button onClick={() => setShowAddTask(true)}>Add a Task</button>
         </div>
       ) : incompleteTasks.length === 0 ? (
-        <div className="empty-box">
-          <div className="empty-icon">✓</div>
-          <h3>All caught up!</h3>
-          <p>All your current tasks are completed. Add a new task when you are ready.</p>
-          <button onClick={() => setShowAddTask(true)}>Add another task</button>
-        </div>
+        <>
+          <div className="empty-box">
+            <div className="empty-icon">✓</div>
+            <h3>All caught up!</h3>
+            <p>All your current tasks are completed. Add a new task when you are ready.</p>
+            <button onClick={() => setShowAddTask(true)}>Add another task</button>
+          </div>
+
+          <TaskList
+            tasks={[]}
+            completedTasks={completedTasks}
+            setTasks={setTasks}
+          />
+        </>
       ) : (
         <TaskList
           tasks={incompleteTasks}
