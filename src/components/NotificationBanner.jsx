@@ -3,6 +3,7 @@ import "./NotificationBanner.css";
 
 function NotificationBanner({ externalMessage }) {
   const [message, setMessage] = useState("");
+  const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
     async function checkStudyGoal() {
@@ -43,17 +44,21 @@ function NotificationBanner({ externalMessage }) {
     }
 
     checkStudyGoal();
+
+    setHidden(false);
+
   }, [externalMessage]);
 
 
-  const finalMessage = externalMessage || message;
+  //const finalMessage = externalMessage || message;
   //if (!message) return null;
+  const finalMessage = hidden ? "" : (externalMessage || message);
   if (!finalMessage) return null;
 
   return (
     <div className="notification-banner">
       <span>{finalMessage}</span>
-      <button onClick={() => setMessage("")}>×</button>
+      <button onClick={() => setHidden(true)}>×</button>
     </div>
   );
 }
