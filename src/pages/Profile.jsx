@@ -132,8 +132,10 @@ useEffect(() => {
       setConfirmPassword("");
       setPasswordError("");
 
-      setSuccessMessage("Password updated successfully!");
-      setTimeout(() => setSuccessMessage(""), 6000);
+      if (newPassword) {
+        setSuccessMessage("Password updated successfully!");
+      }
+      setTimeout(() => setSuccessMessage(""), 3000);
 
     } catch {
       alert("Backend not running!");
@@ -141,15 +143,9 @@ useEffect(() => {
   };
 
   const handleCancel = () => {
-    setName("");
-    setEmail("");
-    setSessionLength(30);
-    setStudyTime(2);
-    setAccuracy(2);
 
     setNewPassword("");
     setConfirmPassword("");
-    setPasswordError("");
 
   };
 
