@@ -188,7 +188,8 @@ function Dashboard() {
           className="new-task-button"
           onClick={() => setShowAddTask(true)}
         >
-          + New Task
+          <span className="new-task-plus">+</span>
+          <span>New Task</span>
         </Button>
       </div>
 

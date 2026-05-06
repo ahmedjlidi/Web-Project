@@ -19,21 +19,45 @@ import "./Analytics.css";
 function Analytics() {
   const { tasks } = useTasks();
 
-  /*
-    Temporary user preferences.
-    Later, these should come from the logged-in user profile.
-  */
-  const userPreferences = {
+  const [sessions, setSessions] = useState([]);
+  const [timeFilter, setTimeFilter] = useState("all");
+  const [userPreferences, setUserPreferences] = useState({
     preferredSessionLength: 45,
     averageDailyStudyTime: 120,
     accuracy: 80
-  };
+  });
 
-  /*
-    Temporary mock sessions.
-    Later, sessions should come from context or database.
-  */
-  const [sessions, setSessions] = useState([]);
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+
+    if (!token) return;
+
+    fetch("http://localhost:3501/api/profile/me", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(async (res) => {
+        const data = await res.json();
+
+        if (!res.ok) {
+          console.log("Profile error:", data.message);
+          return null;
+        }
+
+        return data;
+      })
+      .then((profile) => {
+        if (!profile) return;
+
+        setUserPreferences({
+          preferredSessionLength: Number(profile.preferredSessionLength || 45),
+          averageDailyStudyTime: Number(profile.averageDailyStudyTime || 120),
+          accuracy: Number(profile.accuracy || 0)
+        });
+      })
+      .catch((err) => console.log("Error loading profile:", err));
+  }, []);
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
@@ -59,17 +83,6 @@ function Analytics() {
         const mappedSessions = data.map((session) => ({
           sessionID: session._id,
 
-          /*
-            Because backend uses populate("taskID", ...),
-            taskID may be an object:
-            {
-              _id,
-              title,
-              category,
-              estimatedDuration,
-              deadline
-            }
-          */
           taskID:
             typeof session.taskID === "object"
               ? session.taskID._id
@@ -100,42 +113,125 @@ function Analytics() {
       .catch((err) => console.log("Error loading sessions:", err));
   }, []);
 
-  const totalTasks = tasks.length;
+  function getStartDateForFilter(filter) {
+    const now = new Date();
+    const start = new Date(now);
 
-  const completedTasks = tasks.filter(
+    if (filter === "today") {
+      start.setHours(0, 0, 0, 0);
+      return start;
+    }
+
+    if (filter === "week") {
+      const day = start.getDay();
+      const diff = day === 0 ? 6 : day - 1;
+      start.setDate(start.getDate() - diff);
+      start.setHours(0, 0, 0, 0);
+      return start;
+    }
+
+    if (filter === "month") {
+      start.setDate(1);
+      start.setHours(0, 0, 0, 0);
+      return start;
+    }
+
+    return null;
+  }
+
+  function isInSelectedRange(dateValue) {
+    if (timeFilter === "all") return true;
+    if (!dateValue) return false;
+
+    const date = new Date(dateValue);
+
+    if (isNaN(date.getTime())) return false;
+
+    const startDate = getStartDateForFilter(timeFilter);
+    return date >= startDate;
+  }
+
+  function getTaskDate(task) {
+    return task.createdAt || task.updatedAt || task.deadline;
+  }
+
+  const filteredSessions = sessions.filter((session) =>
+    isInSelectedRange(session.startTime)
+  );
+
+  const filteredTasks = tasks.filter((task) =>
+    isInSelectedRange(getTaskDate(task))
+  );
+
+  const totalTasks = filteredTasks.length;
+
+  const completedTasks = filteredTasks.filter(
     (task) => task.currentProgress >= 100
   );
 
-  const activeTasks = tasks.filter(
+  const activeTasks = filteredTasks.filter(
     (task) => task.currentProgress > 0 && task.currentProgress < 100
   );
 
-  const notStartedTasks = tasks.filter(
+  const notStartedTasks = filteredTasks.filter(
     (task) => task.currentProgress === 0
   );
 
-  const overdueTasks = tasks.filter((task) => {
+  const overdueTasks = filteredTasks.filter((task) => {
     const deadline = new Date(task.deadline);
     const now = new Date();
 
     return deadline < now && task.currentProgress < 100;
   });
 
-  const totalStudyTime = sessions.reduce(
+  const totalStudyTime = filteredSessions.reduce(
     (sum, session) => sum + session.duration,
     0
   );
 
   const averageFocus =
-    sessions.length === 0
+    filteredSessions.length === 0
       ? 0
       : (
-        sessions.reduce((sum, session) => sum + session.focusRating, 0) /
-        sessions.length
+        filteredSessions.reduce(
+          (sum, session) => sum + session.focusRating,
+          0
+        ) / filteredSessions.length
       ).toFixed(1);
 
+  const averageSatisfaction =
+    filteredSessions.length === 0
+      ? 0
+      : (
+        filteredSessions.reduce(
+          (sum, session) => sum + session.satisfactionRating,
+          0
+        ) / filteredSessions.length
+      ).toFixed(1);
+
+  const totalInterruptions = filteredSessions.reduce(
+    (sum, session) => sum + session.interruptions,
+    0
+  );
+
+  const averageInterruptions =
+    filteredSessions.length === 0
+      ? 0
+      : (totalInterruptions / filteredSessions.length).toFixed(1);
+
+  const focusSatisfactionData = filteredSessions.map((session, index) => ({
+    session: `S${index + 1}`,
+    focus: session.focusRating,
+    satisfaction: session.satisfactionRating
+  }));
+
+  const interruptionsData = filteredSessions.map((session, index) => ({
+    session: `S${index + 1}`,
+    interruptions: session.interruptions
+  }));
+
   function getActualDurationForTask(taskID) {
-    return sessions
+    return filteredSessions
       .filter((session) => String(session.taskID) === String(taskID))
       .reduce((sum, session) => sum + session.duration, 0);
   }
@@ -189,23 +285,25 @@ function Analytics() {
       );
 
   const averageSessionLength =
-    sessions.length === 0
+    filteredSessions.length === 0
       ? 0
-      : Math.round(totalStudyTime / sessions.length);
+      : Math.round(totalStudyTime / filteredSessions.length);
 
   const sessionLengthDifference =
     averageSessionLength - userPreferences.preferredSessionLength;
 
   const averageSessionDeviation =
-    sessions.length === 0
+    filteredSessions.length === 0
       ? 0
       : Math.round(
-        sessions.reduce(
+        filteredSessions.reduce(
           (sum, session) =>
             sum +
-            Math.abs(session.duration - userPreferences.preferredSessionLength),
+            Math.abs(
+              session.duration - userPreferences.preferredSessionLength
+            ),
           0
-        ) / sessions.length
+        ) / filteredSessions.length
       );
 
   const taskStatusData = [
@@ -217,7 +315,7 @@ function Analytics() {
 
   const weeklyStudyMap = {};
 
-  sessions.forEach((session) => {
+  filteredSessions.forEach((session) => {
     const date = session.startTime.split("T")[0];
 
     if (weeklyStudyMap[date]) {
@@ -235,8 +333,7 @@ function Analytics() {
       date,
       actual,
       goal,
-      goalCompletion:
-        goal === 0 ? 0 : Math.round((actual / goal) * 100),
+      goalCompletion: goal === 0 ? 0 : Math.round((actual / goal) * 100),
       gap: actual - goal
     };
   });
@@ -269,7 +366,7 @@ function Analytics() {
     })
   );
 
-  const sessionPreferenceData = sessions.map((session, index) => ({
+  const sessionPreferenceData = filteredSessions.map((session, index) => ({
     session: `S${index + 1}`,
     duration: session.duration,
     preferred: userPreferences.preferredSessionLength,
@@ -286,7 +383,7 @@ function Analytics() {
 
   const categoryMap = {};
 
-  tasks.forEach((task) => {
+  filteredTasks.forEach((task) => {
     if (categoryMap[task.category]) {
       categoryMap[task.category] += 1;
     } else {
@@ -301,7 +398,44 @@ function Analytics() {
 
   return (
     <div className="analytics-page">
-      <h1>Analytics</h1>
+      <div className="analytics-header">
+        <div>
+          <h1>Analytics</h1>
+          <p>
+            Review task progress, study sessions, and planning accuracy.
+          </p>
+        </div>
+
+        <div className="analytics-filter-bar">
+          <button
+            className={timeFilter === "today" ? "filter-button active" : "filter-button"}
+            onClick={() => setTimeFilter("today")}
+          >
+            Today
+          </button>
+
+          <button
+            className={timeFilter === "week" ? "filter-button active" : "filter-button"}
+            onClick={() => setTimeFilter("week")}
+          >
+            This Week
+          </button>
+
+          <button
+            className={timeFilter === "month" ? "filter-button active" : "filter-button"}
+            onClick={() => setTimeFilter("month")}
+          >
+            This Month
+          </button>
+
+          <button
+            className={timeFilter === "all" ? "filter-button active" : "filter-button"}
+            onClick={() => setTimeFilter("all")}
+          >
+            All Time
+          </button>
+        </div>
+      </div>
 
       <div className="analytics-grid">
         <div className="analytics-card">
@@ -368,6 +502,14 @@ function Analytics() {
           <p>Days Goal Met</p>
           <h2>{daysGoalMet}</h2>
         </div>
+        <div className="analytics-card">
+          <p>Average Satisfaction</p>
+          <h2>{averageSatisfaction}/5</h2>
+        </div>
+        <div className="analytics-card">
+          <p>Avg Interruptions</p>
+          <h2>{averageInterruptions}</h2>
+        </div>
       </div>
 
       <div className="analytics-section">
@@ -409,6 +551,52 @@ function Analytics() {
               strokeWidth={2}
             />
           </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="analytics-section">
+        <h2>Focus vs Satisfaction</h2>
+
+        <ResponsiveContainer width="100%" height={260}>
+          <LineChart data={focusSatisfactionData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="session" />
+            <YAxis domain={[0, 5]} />
+            <Tooltip />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="focus"
+              name="Focus Rating"
+              stroke="#2563eb"
+              strokeWidth={2}
+            />
+            <Line
+              type="monotone"
+              dataKey="satisfaction"
+              name="Satisfaction Rating"
+              stroke="#10b981"
+              strokeWidth={2}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="analytics-section">
+        <h2>Interruptions per Session</h2>
+
+        <ResponsiveContainer width="100%" height={260}>
+          <BarChart data={interruptionsData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="session" />
+            <YAxis allowDecimals={false} />
+            <Tooltip />
+            <Bar
+              dataKey="interruptions"
+              name="Interruptions"
+              fill="#f97316"
+            />
+          </BarChart>
         </ResponsiveContainer>
       </div>
 

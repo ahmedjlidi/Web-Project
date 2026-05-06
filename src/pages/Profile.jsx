@@ -16,7 +16,7 @@ function Profile({ setUser }) {
 
   const [sessionLength, setSessionLength] = useState(30);
   const [studyTime, setStudyTime] = useState(2);
-  const [accuracy, setAccuracy] = useState(2);
+  const [accuracy, setAccuracy] = useState(80);
 
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -25,28 +25,28 @@ function Profile({ setUser }) {
   const [avatar, setAvatar] = useState("");
 
   // react asks backend for profile data and puts it in the input field
-useEffect(() => {
-  const token = sessionStorage.getItem("token");
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
 
-  if (!token) return;
+    if (!token) return;
 
-  // send get request including the authorization header so backend knows which user logged in
-  fetch("http://localhost:3501/api/profile/me", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then((res) => res.json())    // returns profile data
-    .then((data) => {
-      setName(data.username || "");
-      setEmail(data.email || "");
-      setSessionLength(data.preferredSessionLength || 30);
-      setStudyTime(data.averageDailyStudyTime || 2);
-      setAccuracy(data.accuracy || 0);
-      setAvatar(data.avatar || "");
+    // send get request including the authorization header so backend knows which user logged in
+    fetch("http://localhost:3501/api/profile/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
-    .catch((err) => console.error("Connection failed:", err));
-}, []);
+      .then((res) => res.json())    // returns profile data
+      .then((data) => {
+        setName(data.username || "");
+        setEmail(data.email || "");
+        setSessionLength(data.preferredSessionLength || 30);
+        setStudyTime(data.averageDailyStudyTime || 2);
+        setAccuracy(data.accuracy || 0);
+        setAvatar(data.avatar || "");
+      })
+      .catch((err) => console.error("Connection failed:", err));
+  }, []);
 
   const handleSave = async () => {
     if (newPassword || confirmPassword) {
@@ -60,7 +60,7 @@ useEffect(() => {
         setPasswordError(
           "Password must be at least 8 characters, include a capital letter and a number"
         );
-          return;
+        return;
       }
 
       if (newPassword !== confirmPassword) {
@@ -79,13 +79,13 @@ useEffect(() => {
     // object is sent to backend
     try {
       const res = await fetch("http://localhost:3501/api/profile/me", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-      },
-      body: JSON.stringify(data),
-    });
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(data),
+      });
 
       const result = await res.json();
 
@@ -102,8 +102,11 @@ useEffect(() => {
       setPasswordError("");
 
       if (newPassword) {
-        setSuccessMessage("Password updated successfully!");
+        setSuccessMessage("Profile and password updated successfully!");
+      } else {
+        setSuccessMessage("Profile updated successfully!");
       }
+
       setTimeout(() => setSuccessMessage(""), 3000);
 
     } catch {
@@ -129,8 +132,13 @@ useEffect(() => {
       <h2 className="title">Profile Settings</h2>
 
       {successMessage && (
-        <div className="success-banner">
-          {successMessage}
+        <div className="success-toast">
+          <div className="success-toast-icon">✓</div>
+
+          <div>
+            <h4>Saved successfully</h4>
+            <p>{successMessage}</p>
+          </div>
         </div>
       )}
 

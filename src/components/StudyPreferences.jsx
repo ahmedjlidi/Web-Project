@@ -45,12 +45,13 @@ function StudyPreferences({
 
       <div className="form-group">
         <label>
-          Time Estimation Accuracy: {getAccuracyLabel()}
+          Time Estimation Accuracy: {accuracy}%
         </label>
+
         <input
           type="range"
-          min="1"
-          max="3"
+          min="0"
+          max="100"
           step="1"
           value={accuracy}
           onChange={(e) => setAccuracy(Number(e.target.value))}

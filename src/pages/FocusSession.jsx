@@ -65,58 +65,33 @@ function FocusSession() {
         navigate("/dashboard");
     }
 
-async function handleSubmitSurvey(sessionData) {
-  try {
-    const res = await fetch(
-      `http://localhost:3501/api/tasks/${taskID}/progress`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          progress: sessionData.progressAfter,
-        }),
-      }
-    );
+    function handleSubmitSurvey(savedSession, updatedTask) {
+        const user = JSON.parse(sessionStorage.getItem("user"));
+        const studiedKey = `studiedToday_${user?.id}`;
 
-    const updatedTask = await res.json();
+        const oldStudiedToday =
+            Number(sessionStorage.getItem(studiedKey)) || 0;
 
-    if (!res.ok) {
-      alert(updatedTask.message || "Failed to save progress");
-      return;
+        const newStudiedToday =
+            oldStudiedToday + Number(savedSession.duration || 0);
+
+        sessionStorage.setItem(studiedKey, String(newStudiedToday));
+
+        setTasks((prevTasks) =>
+            prevTasks.map((task) =>
+                task.taskID === taskID
+                    ? {
+                        ...task,
+                        currentProgress: updatedTask.currentProgress,
+                        updatedAt: updatedTask.updatedAt,
+                        completedAt: updatedTask.completedAt,
+                    }
+                    : task
+            )
+        );
+
+        navigate("/dashboard");
     }
-
-    const user = JSON.parse(sessionStorage.getItem("user"));
-const studiedKey = `studiedToday_${user?.id}`;
-
-const oldStudiedToday =
-  Number(sessionStorage.getItem(studiedKey)) || 0;
-
-const newStudiedToday = oldStudiedToday + sessionData.duration;
-
-sessionStorage.setItem(studiedKey, String(newStudiedToday));
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.taskID === taskID
-          ? {
-              ...task,
-              currentProgress: updatedTask.currentProgress,
-              updatedAt: updatedTask.updatedAt,
-              completedAt: updatedTask.completedAt,
-            }
-          : task
-      )
-    );
-
-    navigate("/dashboard");
-  } catch (err) {
-    console.error(err);
-    alert("Server error");
-  }
-}
-
     function handlePause() {
         setIsRunning(false);
     }

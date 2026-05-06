@@ -1,6 +1,23 @@
 import { useEffect, useState } from "react";
 import "./NotificationBanner.css";
 
+function formatMinutes(totalMinutes) {
+  const minutes = Number(totalMinutes) || 0;
+
+  if (minutes < 60) {
+    return `${minutes} min`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  if (remainingMinutes === 0) {
+    return `${hours} hr`;
+  }
+
+  return `${hours} hr ${remainingMinutes} min`;
+}
+
 function NotificationBanner({ externalMessage }) {
   const [message, setMessage] = useState("");
   const [hidden, setHidden] = useState(false);
@@ -23,16 +40,28 @@ function NotificationBanner({ externalMessage }) {
         if (!res.ok) return;
 
         if (!profile || profile.averageDailyStudyTime === undefined) return;
+
         sessionStorage.setItem("profile", JSON.stringify(profile));
 
-        const requiredMinutes = Number(profile.averageDailyStudyTime || 2) * 60;
+        /*
+          If averageDailyStudyTime is already stored in minutes,
+          do NOT multiply by 60.
+
+          Example:
+          120 means 120 minutes, not 120 hours.
+        */
+        const requiredMinutes = Number(profile.averageDailyStudyTime || 0);
+
         const user = JSON.parse(sessionStorage.getItem("user"));
         const studiedKey = `studiedToday_${user?.id}`;
         const studiedToday = Number(sessionStorage.getItem(studiedKey)) || 0;
-        if(!externalMessage){
+
+        if (!externalMessage) {
           if (studiedToday < requiredMinutes) {
+            const remaining = requiredMinutes - studiedToday;
+
             setMessage(
-              `You studied ${studiedToday} minutes today. Your goal is ${requiredMinutes} minutes. Keep going!`
+              `You studied ${formatMinutes(studiedToday)} today. Goal: ${formatMinutes(requiredMinutes)}. ${formatMinutes(remaining)} remaining.`
             );
           } else {
             setMessage("");
@@ -44,21 +73,32 @@ function NotificationBanner({ externalMessage }) {
     }
 
     checkStudyGoal();
-
     setHidden(false);
-
   }, [externalMessage]);
 
+  const finalMessage = hidden ? "" : externalMessage || message;
 
-  //const finalMessage = externalMessage || message;
-  //if (!message) return null;
-  const finalMessage = hidden ? "" : (externalMessage || message);
   if (!finalMessage) return null;
 
+  const isWarning = Boolean(externalMessage);
+
   return (
-    <div className="notification-banner">
-      <span>{finalMessage}</span>
-      <button onClick={() => setHidden(true)}>×</button>
+    <div className={`notification-banner ${isWarning ? "warning" : "goal"}`}>
+      <div className="notification-content">
+        <div className="notification-icon">
+          {isWarning ? "!" : "✓"}
+        </div>
+
+        <span>{finalMessage}</span>
+      </div>
+
+      <button
+        className="notification-close"
+        onClick={() => setHidden(true)}
+        aria-label="Close notification"
+      >
+        ×
+      </button>
     </div>
   );
 }
