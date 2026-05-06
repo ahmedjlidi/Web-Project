@@ -61,7 +61,7 @@ The system connects planned study work with actual study behavior. Users can cre
 
 ---
 
-## Technology Stack
+##  Stack
 
 ### Frontend
 
@@ -233,16 +233,11 @@ sudo apt install -y mongodb-org
 
 ---
 
-## 4. Create Backend Environment File
+## 4. Modify Backend Environment File (if needed)
 
-Inside the `backend` folder, create a `.env` file:
+Inside the `backend` folder, there is an `.env` file:
 
-```bash
-cd backend
-touch .env
-```
 
-Add the following:
 
 ```env
 MONGO_URI=mongodb://127.0.0.1:27017/studybuddy
@@ -250,11 +245,7 @@ JWT_SECRET=your_secret_key_here
 PORT=3501
 ```
 
-Then return to the project root:
-
-```bash
-cd ..
-```
+Modify the port number of JWT key as needed
 
 ---
 
@@ -536,113 +527,7 @@ These values are fetched from the logged-in user profile.
 
 ---
 
-# Manual Database Inspection
 
-Open MongoDB shell:
-
-```bash
-mongosh
-```
-
-Select the database:
-
-```js
-use studybuddy
-```
-
-Show collections:
-
-```js
-show collections
-```
-
-View users:
-
-```js
-db.users.find().pretty()
-```
-
-View tasks:
-
-```js
-db.tasks.find().pretty()
-```
-
-View study sessions:
-
-```js
-db.studysessions.find().pretty()
-```
-
-Clear a specific collection:
-
-```js
-db.studysessions.deleteMany({})
-```
-
----
-
-# Common Issues
-
-## Backend cannot find a route or controller
-
-Check that the file exists and the name matches exactly.
-
-Linux is case-sensitive. These are different:
-
-```txt
-studySessionRoutes.js
-StudySessionRoutes.js
-studysessionRoutes.js
-```
-
-## MongoDB connection refused
-
-Make sure MongoDB is running.
-
-Using local database folder:
-
-```bash
-mongod --dbpath ./db --port 27017
-```
-
-Using system service:
-
-```bash
-sudo systemctl start mongod
-```
-
-## 404 on API request
-
-Check that the route is mounted in `server.js`.
-
-Example:
-
-```js
-app.use("/api/sessions", studySessionRoutes);
-```
-
-## Not authorized, no token
-
-The frontend did not send the JWT token.
-
-Check that the request includes:
-
-```js
-Authorization: `Bearer ${sessionStorage.getItem("token")}`
-```
-
-## No data appears in analytics
-
-Check if study sessions exist:
-
-```js
-db.studysessions.find().pretty()
-```
-
-If no sessions exist, the analytics page has no session records to calculate from.
-
----
 
 # Team Members
 
