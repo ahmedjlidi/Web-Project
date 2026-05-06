@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import {
   BarChart,
   Bar,
@@ -18,55 +20,85 @@ function Analytics() {
   const { tasks } = useTasks();
 
   /*
-      Temporary mock sessions.
-      Later, sessions should come from context or database.
-
-      Each session belongs to one task using taskID.
+    Temporary user preferences.
+    Later, these should come from the logged-in user profile.
   */
-  const sessions = [
-    {
-      sessionID: 201,
-      taskID: 101,
-      userID: 1,
-      startTime: "2026-03-02T18:00:00",
-      endTime: "2026-03-02T18:45:00",
-      duration: 45,
-      progressBefore: 0,
-      progressAfter: 30,
-      focusRating: 4,
-      satisfactionRating: 3,
-      interruptions: 1,
-      createdAt: "2026-03-02T18:45:00"
-    },
-    {
-      sessionID: 202,
-      taskID: 101,
-      userID: 1,
-      startTime: "2026-03-03T16:00:00",
-      endTime: "2026-03-03T16:30:00",
-      duration: 30,
-      progressBefore: 30,
-      progressAfter: 100,
-      focusRating: 5,
-      satisfactionRating: 4,
-      interruptions: 0,
-      createdAt: "2026-03-03T16:30:00"
-    },
-    {
-      sessionID: 203,
-      taskID: 102,
-      userID: 1,
-      startTime: "2026-03-04T19:00:00",
-      endTime: "2026-03-04T19:50:00",
-      duration: 50,
-      progressBefore: 0,
-      progressAfter: 40,
-      focusRating: 3,
-      satisfactionRating: 3,
-      interruptions: 2,
-      createdAt: "2026-03-04T19:50:00"
-    }
-  ];
+  const userPreferences = {
+    preferredSessionLength: 45,
+    averageDailyStudyTime: 120,
+    accuracy: 80
+  };
+
+  /*
+    Temporary mock sessions.
+    Later, sessions should come from context or database.
+  */
+  const [sessions, setSessions] = useState([]);
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+
+    if (!token) return;
+
+    fetch("http://localhost:3501/api/sessions", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(async (res) => {
+        const data = await res.json();
+
+        if (!res.ok) {
+          console.log("Sessions error:", data.message);
+          return [];
+        }
+
+        return data;
+      })
+      .then((data) => {
+        const mappedSessions = data.map((session) => ({
+          sessionID: session._id,
+
+          /*
+            Because backend uses populate("taskID", ...),
+            taskID may be an object:
+            {
+              _id,
+              title,
+              category,
+              estimatedDuration,
+              deadline
+            }
+          */
+          taskID:
+            typeof session.taskID === "object"
+              ? session.taskID._id
+              : session.taskID,
+
+          taskTitle:
+            typeof session.taskID === "object"
+              ? session.taskID.title
+              : "Task",
+
+          userID: session.userID,
+          startTime: session.startTime,
+          endTime: session.endTime,
+          duration: Number(session.duration),
+
+          progressBefore: Number(session.progressBefore),
+          progressAfter: Number(session.progressAfter),
+
+          focusRating: Number(session.focusRating),
+          satisfactionRating: Number(session.satisfactionRating),
+          interruptions: Number(session.interruptions),
+
+          createdAt: session.createdAt
+        }));
+
+        setSessions(mappedSessions);
+      })
+      .catch((err) => console.log("Error loading sessions:", err));
+  }, []);
 
   const totalTasks = tasks.length;
 
@@ -104,7 +136,7 @@ function Analytics() {
 
   function getActualDurationForTask(taskID) {
     return sessions
-      .filter((session) => session.taskID === taskID)
+      .filter((session) => String(session.taskID) === String(taskID))
       .reduce((sum, session) => sum + session.duration, 0);
   }
 
@@ -115,7 +147,8 @@ function Analytics() {
       taskName: task.title,
       estimated: task.estimatedDuration,
       actual: actualDuration,
-      bias: actualDuration - task.estimatedDuration
+      bias: actualDuration - task.estimatedDuration,
+      absoluteError: Math.abs(actualDuration - task.estimatedDuration)
     };
   });
 
@@ -127,6 +160,52 @@ function Analytics() {
           (sum, task) => sum + task.bias,
           0
         ) / completedTasksWithActualTime.length
+      );
+
+  const meanAbsoluteEstimationError =
+    completedTasksWithActualTime.length === 0
+      ? 0
+      : Math.round(
+        completedTasksWithActualTime.reduce(
+          (sum, task) => sum + task.absoluteError,
+          0
+        ) / completedTasksWithActualTime.length
+      );
+
+  const measuredAccuracy =
+    completedTasksWithActualTime.length === 0
+      ? 0
+      : Math.round(
+        completedTasksWithActualTime.reduce((sum, task) => {
+          if (!task.estimated || task.estimated <= 0) return sum;
+
+          const errorRate =
+            Math.abs(task.actual - task.estimated) / task.estimated;
+
+          const taskAccuracy = Math.max(0, 100 - errorRate * 100);
+
+          return sum + taskAccuracy;
+        }, 0) / completedTasksWithActualTime.length
+      );
+
+  const averageSessionLength =
+    sessions.length === 0
+      ? 0
+      : Math.round(totalStudyTime / sessions.length);
+
+  const sessionLengthDifference =
+    averageSessionLength - userPreferences.preferredSessionLength;
+
+  const averageSessionDeviation =
+    sessions.length === 0
+      ? 0
+      : Math.round(
+        sessions.reduce(
+          (sum, session) =>
+            sum +
+            Math.abs(session.duration - userPreferences.preferredSessionLength),
+          0
+        ) / sessions.length
       );
 
   const taskStatusData = [
@@ -148,16 +227,62 @@ function Analytics() {
     }
   });
 
-  const weeklyStudyData = Object.keys(weeklyStudyMap).map((date) => ({
-    date,
-    minutes: weeklyStudyMap[date]
-  }));
+  const weeklyStudyData = Object.keys(weeklyStudyMap).map((date) => {
+    const actual = weeklyStudyMap[date];
+    const goal = userPreferences.averageDailyStudyTime;
+
+    return {
+      date,
+      actual,
+      goal,
+      goalCompletion:
+        goal === 0 ? 0 : Math.round((actual / goal) * 100),
+      gap: actual - goal
+    };
+  });
+
+  const dailyGoalCompletion =
+    weeklyStudyData.length === 0
+      ? 0
+      : Math.round(
+        weeklyStudyData.reduce(
+          (sum, day) => sum + day.goalCompletion,
+          0
+        ) / weeklyStudyData.length
+      );
+
+  const daysGoalMet = weeklyStudyData.filter(
+    (day) => day.actual >= day.goal
+  ).length;
 
   const estimatedVsActualData = completedTasksWithActualTime.map((task) => ({
     taskName: task.taskName,
     estimated: task.estimated,
     actual: task.actual
   }));
+
+  const estimationErrorTrendData = completedTasksWithActualTime.map(
+    (task, index) => ({
+      taskName: task.taskName || `Task ${index + 1}`,
+      bias: task.bias,
+      absoluteError: task.absoluteError
+    })
+  );
+
+  const sessionPreferenceData = sessions.map((session, index) => ({
+    session: `S${index + 1}`,
+    duration: session.duration,
+    preferred: userPreferences.preferredSessionLength,
+    difference: session.duration - userPreferences.preferredSessionLength
+  }));
+
+  const accuracyComparisonData = [
+    {
+      label: "Accuracy",
+      selfRated: userPreferences.accuracy,
+      measured: measuredAccuracy
+    }
+  ];
 
   const categoryMap = {};
 
@@ -208,6 +333,41 @@ function Analytics() {
           <p>Estimation Bias</p>
           <h2>{estimationBias} min</h2>
         </div>
+
+        <div className="analytics-card">
+          <p>Mean Absolute Error</p>
+          <h2>{meanAbsoluteEstimationError} min</h2>
+        </div>
+
+        <div className="analytics-card">
+          <p>Measured Accuracy</p>
+          <h2>{measuredAccuracy}%</h2>
+        </div>
+
+        <div className="analytics-card">
+          <p>Self-Rated Accuracy</p>
+          <h2>{userPreferences.accuracy}%</h2>
+        </div>
+
+        <div className="analytics-card">
+          <p>Avg Session Length</p>
+          <h2>{averageSessionLength} min</h2>
+        </div>
+
+        <div className="analytics-card">
+          <p>Session Match</p>
+          <h2>{sessionLengthDifference} min</h2>
+        </div>
+
+        <div className="analytics-card">
+          <p>Daily Goal Progress</p>
+          <h2>{dailyGoalCompletion}%</h2>
+        </div>
+
+        <div className="analytics-card">
+          <p>Days Goal Met</p>
+          <h2>{daysGoalMet}</h2>
+        </div>
       </div>
 
       <div className="analytics-section">
@@ -219,13 +379,13 @@ function Analytics() {
             <XAxis dataKey="status" />
             <YAxis allowDecimals={false} />
             <Tooltip />
-            <Bar dataKey="count" fill="#2563eb"/>
+            <Bar dataKey="count" fill="#2563eb" />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
       <div className="analytics-section">
-        <h2>Weekly Study Volume</h2>
+        <h2>Daily Study Goal vs Actual</h2>
 
         <ResponsiveContainer width="100%" height={260}>
           <LineChart data={weeklyStudyData}>
@@ -233,10 +393,19 @@ function Analytics() {
             <XAxis dataKey="date" />
             <YAxis />
             <Tooltip />
+            <Legend />
             <Line
               type="monotone"
-              dataKey="minutes"
+              dataKey="actual"
+              name="Actual Study Time"
               stroke="#2563eb"
+              strokeWidth={2}
+            />
+            <Line
+              type="monotone"
+              dataKey="goal"
+              name="Daily Goal"
+              stroke="#ef4444"
               strokeWidth={2}
             />
           </LineChart>
@@ -253,8 +422,84 @@ function Analytics() {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="estimated" name="Estimated Time" fill="#60a5fa"/>
+            <Bar dataKey="estimated" name="Estimated Time" fill="#60a5fa" />
             <Bar dataKey="actual" name="Actual Time" fill="#10b981" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="analytics-section">
+        <h2>Estimation Error Trend</h2>
+
+        <ResponsiveContainer width="100%" height={260}>
+          <LineChart data={estimationErrorTrendData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="taskName" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="bias"
+              name="Bias Actual - Estimated"
+              stroke="#2563eb"
+              strokeWidth={2}
+            />
+            <Line
+              type="monotone"
+              dataKey="absoluteError"
+              name="Absolute Error"
+              stroke="#f97316"
+              strokeWidth={2}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="analytics-section">
+        <h2>Session Duration vs Preferred Length</h2>
+
+        <ResponsiveContainer width="100%" height={260}>
+          <BarChart data={sessionPreferenceData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="session" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar
+              dataKey="duration"
+              name="Actual Session Duration"
+              fill="#2563eb"
+            />
+            <Bar
+              dataKey="preferred"
+              name="Preferred Session Length"
+              fill="#94a3b8"
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="analytics-section">
+        <h2>Self-Rated vs Measured Accuracy</h2>
+
+        <ResponsiveContainer width="100%" height={240}>
+          <BarChart data={accuracyComparisonData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="label" />
+            <YAxis domain={[0, 100]} />
+            <Tooltip />
+            <Legend />
+            <Bar
+              dataKey="selfRated"
+              name="Self-Rated Accuracy"
+              fill="#8b5cf6"
+            />
+            <Bar
+              dataKey="measured"
+              name="Measured Accuracy"
+              fill="#10b981"
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -268,7 +513,7 @@ function Analytics() {
             <XAxis dataKey="category" />
             <YAxis allowDecimals={false} />
             <Tooltip />
-            <Bar dataKey="count" />
+            <Bar dataKey="count" fill="#2563eb" />
           </BarChart>
         </ResponsiveContainer>
       </div>

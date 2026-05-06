@@ -6,6 +6,7 @@ require("dotenv").config();
 const authRoutes = require("./routes/authRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const profileRoutes = require("./routes/profileRoutes");
+const studySessionRoutes = require("./routes/studySessionRoutes");
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(express.json({ limit: "5mb" }));
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/sessions", studySessionRoutes);
 
 app.get("/", (req, res) => {
   res.send("StudyBuddy backend is running");
