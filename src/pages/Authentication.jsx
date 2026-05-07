@@ -335,11 +335,9 @@ function Authentication({ state }) {
                         <a href="/forgot-password">Forgot password?</a>
                     </div>
                 )}
-
-                <button type="submit">
+                <button type="submit" className="auth-submit-button">
                     {isLogin ? 'Log In' : 'Sign Up'}
                 </button>
-
                 <p>
                     {isLogin ? "Don't have an account?" : 'Already have an account?'}
                     <span

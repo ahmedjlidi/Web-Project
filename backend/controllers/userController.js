@@ -11,21 +11,35 @@ const registerUser = async (req, res) => {
       });
     }
 
-    const existingUser = await User.findOne({
-      email: email.toLowerCase(),
+    const finalUsername = username || name || "student";
+    const normalizedEmail = email.toLowerCase();
+    const normalizedUsername = finalUsername.trim();
+
+    const existingEmail = await User.findOne({
+      email: normalizedEmail,
     });
 
-    if (existingUser) {
+    if (existingEmail) {
       return res.status(400).json({
-        message: "User already exists",
+        message: "Email already exists",
+      });
+    }
+
+    const existingUsername = await User.findOne({
+      username: normalizedUsername,
+    });
+
+    if (existingUsername) {
+      return res.status(400).json({
+        message: "Username already exists",
       });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
 
     const user = await User.create({
-      username: username || name || "student",
-      email: email.toLowerCase(),
+      username: normalizedUsername,
+      email: normalizedEmail,
       passwordHash,
     });
 

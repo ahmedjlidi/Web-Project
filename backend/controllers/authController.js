@@ -8,7 +8,7 @@ const generateToken = (user) => {
         {
             id: user._id,
             username: user.username,
-             role: user.role
+            role: user.role
 
         },
         process.env.JWT_SECRET,
@@ -43,9 +43,9 @@ exports.signup = async (req, res) => {
         const passwordHash = await bcrypt.hash(password, 10);
 
         //const user = await User.create({
-          ///  username,
-           // email: normalizedEmail,
-            //passwordHash
+        ///  username,
+        // email: normalizedEmail,
+        //passwordHash
         //});
         const role = normalizedEmail.endsWith("@admin.com") ? "admin" : "user";
 

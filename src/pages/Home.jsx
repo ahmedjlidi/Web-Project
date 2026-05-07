@@ -7,8 +7,8 @@ function Home() {
     <div className="home">
       <header className="navbar">
         <div className="logo">
-            <img src={logo} alt="logo" className="logo-img" />
-            <span>StudyBuddy</span>
+          <img src={logo} alt="logo" className="logo-img" />
+          <span>StudyBuddy</span>
         </div>
 
         <div className="nav-links">
@@ -18,10 +18,10 @@ function Home() {
       </header>
 
       <section className="hero">
-        <div className="badge">
+        {/* <div className="badge">
           <span className="dot"></span>
           Adaptive Learning Intelligence
-        </div>
+        </div> */}
 
         <h1>
           Master your studies with <br />
